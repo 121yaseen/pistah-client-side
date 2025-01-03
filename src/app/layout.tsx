@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import SessionWrapper from "./components/SessionWrapper";
+import { ToastProvider } from "./context/ToastContext";
 
 export const metadata: Metadata = {
   title: "Pistah Client Side",
@@ -15,9 +16,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        <SessionWrapper>
-          {children}
-        </SessionWrapper>
+        <ToastProvider>
+          <SessionWrapper>
+            {children}
+          </SessionWrapper>
+        </ToastProvider>
       </body>
     </html>
   );

@@ -170,17 +170,17 @@ export default function Header({ navLinks = [] }: HeaderProps) {
           >
             <span
               className={`text-xs mt-1 group-hover:text-white ${
-                pathname === "/inventory" ? "text-white" : "text-gray-500"
+                pathname === "/creative" ? "text-white" : "text-gray-500"
               }`}
             >
               <InventoryIcon />
             </span>
             <span
               className={`text-xs mt-1 group-hover:text-white ${
-                pathname === "/inventory" ? "text-white" : "text-gray-400"
+                pathname === "/creative" ? "text-white" : "text-gray-400"
               }`}
             >
-              Inventory
+              My Creatives
             </span>
           </Link>
 
