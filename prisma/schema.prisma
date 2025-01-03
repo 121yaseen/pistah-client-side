@@ -1,0 +1,79 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Ad {
+  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  title              String
+  downloadLink       String
+  adBoardId          String   @db.ObjectId
+  adDisplayStartDate DateTime
+  adDisplayEndDate   DateTime
+  adDuration         String
+  thumbnailUrl       String
+  createdById        String   @db.ObjectId
+  createdUser        User     @relation(fields: [createdById], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  // This need to be updated on enable features centered on ads such as ad editing, ad deletion, ad display status
+  adBoard            AdBoard  @relation("AdToAdBoard", fields: [adBoardId], references: [id], onDelete: Cascade)
+}
+
+model AdBoard {
+  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
+  boardName           String
+  location            String
+  dimensions          String
+  boardType           String
+  isAvailable         Boolean
+  dailyRate           Float
+  operationalHours    String
+  ownerContact        String
+  lastMaintenanceDate DateTime
+  createdById         String   @db.ObjectId
+  createdUser         User     @relation(fields: [createdById], references: [id])
+  imageUrl            String   @default("")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  ads                 Ad[]     @relation("AdToAdBoard")
+}
+
+model User {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  email         String    @unique
+  password      String?
+  profilePicUrl String?   @default("")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  Company       Company?
+  Ad            Ad[]
+  AdBoard       AdBoard[]
+}
+
+model Account {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId             String    @db.ObjectId
+  provider           String
+  providerAccountId  String
+  refreshToken       String?
+  accessToken        String?
+  accessTokenExpires DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Company {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userid    String   @unique @db.ObjectId
+  user      User     @relation(fields: [userid], references: [id])
+}
