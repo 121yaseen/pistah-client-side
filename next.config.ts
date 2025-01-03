@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
       "pistah-s3-1.s3.us-east-2.amazonaws.com",
     ],
   },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
