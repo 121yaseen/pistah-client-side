@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SessionWrapper from "./components/SessionWrapper";
 
 export const metadata: Metadata = {
   title: "Pistah Client Side",
@@ -13,7 +14,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body suppressHydrationWarning>
+        <SessionWrapper>
+          {children}
+        </SessionWrapper>
+      </body>
     </html>
   );
 }
