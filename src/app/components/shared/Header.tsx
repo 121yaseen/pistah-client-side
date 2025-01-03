@@ -8,10 +8,10 @@ import ProfileIcon from "@/icons/profileIcon";
 import CreateAdModal from "../modals/CreateAdModal";
 import DarkModeToggle from "./DarkModeToggleButton";
 import InventoryIcon from "@/icons/inventoryIcon";
-import DashboardIcon from "@/icons/dashboardIcon";
 import { signOut, useSession } from "next-auth/react";
 import CreateAdIcon from "@/icons/createAdIcon";
 import PistahIcon from "@/icons/pistahIcon";
+import CreativeIcon from "@/icons/creativeIcon";
 
 type HeaderProps = {
   navLinks?: { href: string; label: string }[];
@@ -124,9 +124,8 @@ export default function Header({ navLinks = [] }: HeaderProps) {
           <Link
             key={link.href}
             href={link.href}
-            className={`${
-              pathname === link.href ? "underline underline-offset-4" : ""
-            } font-medium`}
+            className={`${pathname === link.href ? "underline underline-offset-4" : ""
+              } font-medium`}
           >
             {link.label}
           </Link>
@@ -136,51 +135,45 @@ export default function Header({ navLinks = [] }: HeaderProps) {
         <div className="flex items-center space-x-6">
           {/* Dashboard Icon */}
           <Link
-            className={`flex flex-col items-center group ${
-              pathname === "/dashboard"
-                ? "text-white border-b-2"
-                : "text-gray-500"
-            }`}
-            href="/dashboard"
+            className={`flex flex-col items-center group ${pathname === "/inventory"
+              ? "text-white border-b-2"
+              : "text-gray-500"
+              }`}
+            href="/inventory"
           >
             <span
-              className={`text-xs mt-1 group-hover:text-white ${
-                pathname === "/dashboard" ? "text-white" : "text-gray-500"
-              }`}
+              className={`text-xs mt-1 group-hover:text-white ${pathname === "/inventory" ? "text-white" : "text-gray-500"
+                }`}
             >
-              <DashboardIcon />
+              <InventoryIcon />
             </span>
             <span
-              className={`text-xs mt-1 group-hover:text-white ${
-                pathname === "/dashboard" ? "text-white" : "text-gray-400"
-              }`}
+              className={`text-xs mt-1 group-hover:text-white ${pathname === "/inventory" ? "text-white" : "text-gray-400"
+                }`}
             >
-              Dashboard
+              Inventory
             </span>
           </Link>
 
           {/* Inventory Icon */}
           <Link
-            className={`flex flex-col items-center group ${
-              pathname === "/inventory"
-                ? "text-white border-b-2"
-                : "text-gray-500"
-            }`}
-            href="/inventory"
+            className={`flex flex-col items-center group ${pathname === "/creatives"
+              ? "text-white border-b-2"
+              : "text-gray-500"
+              }`}
+            href="/creatives"
           >
             <span
-              className={`text-xs mt-1 group-hover:text-white ${
-                pathname === "/inventory" ? "text-white" : "text-gray-500"
-              }`}
+              className={`text-xs mt-1 group-hover:text-white ${pathname === "/creatives" ? "text-white" : "text-gray-500"
+                }`}
             >
-              <InventoryIcon />
+              <CreativeIcon />
             </span>
             <span
-              className={`text-xs mt-1 group-hover:text-white ${
-                pathname === "/inventory" ? "text-white" : "text-gray-400"
-              }`}
+              className={`text-xs mt-1 group-hover:text-white ${pathname === "/creatives" ? "text-white" : "text-gray-400"
+                }`}
             >
-              Inventory
+              My Creatives
             </span>
           </Link>
 

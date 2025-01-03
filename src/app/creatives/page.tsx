@@ -1,12 +1,12 @@
 import Header from "../components/shared/Header"
-import InventoryPageComponent from "./inventoryPage";
+import CreativePageComponent from "./creativePage";
 
 export default function DashboardPage() {
   return (
     <>
       <Header />
       <main>
-        <InventoryPageComponent />
+        <CreativePageComponent />
       </main>
     </>
   );
