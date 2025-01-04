@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import PistahIcon from "@/icons/pistahIcon";
-import Loader from "../components/shared/LoaderComponent";
+import { useLoader } from "../components/shared/LoaderComponent";
 
 const Register = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const { showLoader, hideLoader } = useLoader();
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -38,7 +38,7 @@ const Register = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    showLoader();
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
@@ -68,13 +68,12 @@ const Register = () => {
       console.error("Error registering:", error);
       alert("An error occurred. Please try again.");
     } finally {
-      setIsLoading(false);
+      hideLoader();
     }
   };
 
   return (
     <div>
-      <Loader isVisible={isLoading} />
       <header className="flex justify-between items-center px-6 py-4 bg-[#001464] text-[#001464] shadow-md">
         <div className="flex items-center gap-4">
           <PistahIcon />

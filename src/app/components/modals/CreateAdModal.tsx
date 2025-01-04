@@ -2,16 +2,16 @@
 
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/app/context/ToastContext";
-import Loader from "../shared/LoaderComponent";
 import DateRangePicker from "../shared/DateRangePicker";
+import { useLoader } from "../shared/LoaderComponent";
 
 type CreateAdModalProps = {
   onClose: () => void;
 };
 
 const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
+  const { showLoader, hideLoader } = useLoader();
   const { addToast } = useToast();
-  const [isLoading, setIsLoading] = useState(false); // Loader state
 
   const [adData, setAdData] = useState({
     id: Date.now(),
@@ -130,7 +130,7 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
     }
 
     try {
-      setIsLoading(true);
+      showLoader();
       const response = await fetch("/api/creatives", {
         method: "POST",
         body: formData,
@@ -149,13 +149,12 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
       addToast("Something went wrong!", "error");
       console.error("Error creating ad:", error);
     } finally {
-      setIsLoading(false);
+      hideLoader();
     }
   };
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <Loader isVisible={isLoading} />
       <div
         className="bg-white dark:bg-gray-800 dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
         style={{

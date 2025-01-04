@@ -3,10 +3,11 @@
 import { useSession } from "next-auth/react";
 import router from "next/router";
 import { useEffect } from "react";
-import Loader from "./components/shared/LoaderComponent";
 import { redirect } from "next/navigation";
+import { useLoader } from "./components/shared/LoaderComponent";
 
 export default function Home() {
+  const { showLoader, hideLoader } = useLoader();
   const { status } = useSession();
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -17,7 +18,7 @@ export default function Home() {
   }, [status]);
 
   if (status === "loading") {
-    return <Loader isVisible={true} />;
+    showLoader();
   }
   if (status === "authenticated") {
     redirect("/inventory");
