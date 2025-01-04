@@ -18,9 +18,9 @@ export async function middleware(req: NextRequest) {
     secret: process.env.NEXTAUTH_SECRET,
   })) as CustomToken;
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
+  // if (!token) {
+  //   return NextResponse.redirect(new URL("/login", req.url));
+  // }
   const username = token?.user?.name || "Guest";
   console.log(`User: ${username}, Path: ${pathname}`);
   return NextResponse.next();
