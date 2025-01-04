@@ -12,7 +12,7 @@ import { signOut, useSession } from "next-auth/react";
 import CreateAdIcon from "@/icons/createAdIcon";
 import PistahIcon from "@/icons/pistahIcon";
 import CreativeIcon from "@/icons/creativeIcon";
-import Loader from "./LoaderComponent";
+import { useLoader } from "./LoaderComponent";
 
 type HeaderProps = {
   navLinks?: { href: string; label: string }[];
@@ -25,7 +25,7 @@ type User = {
 };
 
 export default function Header({ navLinks = [] }: HeaderProps) {
-  const [isLoading, setIsLoading] = useState(false);
+  const { showLoader, hideLoader } = useLoader();
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
 
@@ -62,7 +62,7 @@ export default function Header({ navLinks = [] }: HeaderProps) {
     const fetchUser = async () => {
       if (session?.user?.email) {
         try {
-          setIsLoading(true);
+          showLoader();
           const response = await fetch(`/api/user/${session.user.email}`);
           if (response.ok) {
             const data = await response.json();
@@ -73,7 +73,7 @@ export default function Header({ navLinks = [] }: HeaderProps) {
         } catch (error) {
           console.error("Error fetching user details:", error);
         } finally {
-          setIsLoading(false);
+          hideLoader();
         }
       }
     };
@@ -102,7 +102,6 @@ export default function Header({ navLinks = [] }: HeaderProps) {
 
   return (
     <header className="flex justify-between items-center px-6 py-3 bg-[#001464] text-white shadow-md relative">
-      <Loader isVisible={isLoading} />
       {/* Left Section: Logo */}
       <div className="flex items-center">
         <Link href="/" className="flex items-center">
