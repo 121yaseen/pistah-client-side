@@ -1,5 +1,5 @@
 import Header from "../components/shared/Header"
-import InventoryPageComponent from "./inventoryPage";
+import InventoryPageComponent from "../components/InventoryPage";
 
 export default function InventoryPage() {
   return (

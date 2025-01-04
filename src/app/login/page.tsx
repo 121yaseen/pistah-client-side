@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import PistahIcon from "@/icons/pistahIcon";
+import Loader from "../components/shared/LoaderComponent";
 
 const Login = () => {
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({ email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
@@ -30,6 +32,7 @@ const Login = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
     const result = await signIn("credentials", {
       redirect: false,
       email: formData.email,
@@ -41,10 +44,12 @@ const Login = () => {
     } else {
       alert("Login failed. Please check your credentials.");
     }
+    setIsLoading(false);
   };
 
   return (
     <div className="h-screen flex flex-col">
+      <Loader isVisible={isLoading} />
       {/* Header */}
       <header className="flex justify-between items-center px-6 py-4 bg-[#001464] shadow-md">
         <div className="flex items-center gap-4">

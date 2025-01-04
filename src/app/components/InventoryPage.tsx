@@ -3,18 +3,23 @@
 import { AdBoard } from "@prisma/client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Loader from "./shared/LoaderComponent";
 
 export default function InventoryPageComponent() {
+  const [isLoading, setIsLoading] = useState(false);
   const [adBoards, setAdBoards] = useState<AdBoard[]>([]);
 
   useEffect(() => {
     async function fetchAdBoards() {
       try {
+        setIsLoading(true);
         const response = await fetch("/api/adBoard");
         const data = await response.json();
         setAdBoards(data);
       } catch (error) {
         console.error("Error fetching ad boards:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
@@ -23,6 +28,7 @@ export default function InventoryPageComponent() {
 
   return (
     <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+      <Loader isVisible={isLoading} />
       <div className="container mx-auto p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {adBoards.map((adBoard) => (
