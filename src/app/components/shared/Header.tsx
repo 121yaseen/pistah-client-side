@@ -5,11 +5,9 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import ProfileIcon from "@/icons/profileIcon";
-import CreateAdModal from "../modals/CreateAdModal";
 import DarkModeToggle from "./DarkModeToggleButton";
 import InventoryIcon from "@/icons/inventoryIcon";
 import { signOut, useSession } from "next-auth/react";
-import CreateAdIcon from "@/icons/createAdIcon";
 import PistahIcon from "@/icons/pistahIcon";
 import CreativeIcon from "@/icons/creativeIcon";
 import { useLoader } from "./LoaderComponent";
@@ -30,7 +28,6 @@ export default function Header({ navLinks = [] }: HeaderProps) {
   const [user, setUser] = useState<User | null>(null);
 
   const pathname = usePathname();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const profilePicRef = useRef<HTMLDivElement | null>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -87,19 +84,6 @@ export default function Header({ navLinks = [] }: HeaderProps) {
     });
   };
 
-  useEffect(() => {
-    if (isModalOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-
-    // Cleanup when the component is unmounted
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [isModalOpen]);
-
   return (
     <header className="flex justify-between items-center px-6 py-3 bg-[#001464] text-white shadow-md relative">
       {/* Left Section: Logo */}
@@ -111,19 +95,6 @@ export default function Header({ navLinks = [] }: HeaderProps) {
 
       {/* Right Section: Nav Links & Profile */}
       <div className="flex items-center gap-6 relative">
-        {/* Create Ad Button */}
-        <button
-          onClick={() => setIsModalOpen(true)} // Open the modal on click
-          className="h-8 px-2 bg-white text-[#001464] dark:bg-gray-800 dark:text-gray-200 font-semibold text-lg rounded-full 
-          border border-gray-300 dark:border-gray-700 transition flex items-center justify-center gap-2
-          dark:hover:ring-2 hover:ring-4 hover:ring-blue-600"
-        >
-          <span className="flex items-center">
-            <CreateAdIcon />
-          </span>
-          <span className="flex items-center text-xs">Add Creative</span>
-        </button>
-
         {/* Navigation Links */}
         {navLinks.map((link) => (
           <Link
@@ -216,7 +187,7 @@ export default function Header({ navLinks = [] }: HeaderProps) {
         {dropdownOpen && (
           <div
             ref={dropdownRef}
-            className="absolute right-0 mt-[60%] w-48 bg-white shadow-lg rounded-md text-gray-800 z-50 dark:bg-gray-800 dark:text-white"
+            className="absolute right-0 mt-[105%] w-48 bg-white shadow-lg rounded-md text-gray-800 z-50 dark:bg-gray-800 dark:text-white"
           >
             <ul className="py-2">
               {/* My Profile */}
@@ -249,8 +220,6 @@ export default function Header({ navLinks = [] }: HeaderProps) {
           </div>
         )}
       </div>
-      {/* Create Ad Modal */}
-      {isModalOpen && <CreateAdModal onClose={() => setIsModalOpen(false)} />}
     </header>
   );
 }
