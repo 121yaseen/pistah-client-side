@@ -103,6 +103,7 @@ const Register = () => {
                 width={350}
                 height={350}
                 className="object-contain"
+                priority
               />
             </div>
           </div>
