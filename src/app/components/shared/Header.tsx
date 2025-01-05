@@ -133,20 +133,20 @@ export default function Header({ navLinks = [] }: HeaderProps) {
 
           {/* Inventory Icon */}
           <Link
-            className={`flex flex-col items-center group ${pathname === "/creatives"
+            className={`flex flex-col items-center group ${pathname === "/campaigns"
               ? "text-white border-b-2"
               : "text-gray-500"
               }`}
-            href="/creatives"
+            href="/campaigns"
           >
             <span
-              className={`text-xs mt-1 group-hover:text-white ${pathname === "/creatives" ? "text-white" : "text-gray-500"
+              className={`text-xs mt-1 group-hover:text-white ${pathname === "/campaigns" ? "text-white" : "text-gray-500"
                 }`}
             >
               <CreativeIcon />
             </span>
             <span
-              className={`text-xs mt-1 group-hover:text-white ${pathname === "/creatives" ? "text-white" : "text-gray-400"
+              className={`text-xs mt-1 group-hover:text-white ${pathname === "/campaigns" ? "text-white" : "text-gray-400"
                 }`}
             >
               My Campaigns
