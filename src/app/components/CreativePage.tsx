@@ -2,7 +2,7 @@
 
 import AddIcon from "@/icons/addIcon";
 import React, { useState } from "react";
-import CreateAdModal from "./modals/CreateAdModal";
+import CreateAndBookCreativeModal from "./modals/CreateAndBookCreativeModal";
 
 const CreativePageComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -28,7 +28,7 @@ const CreativePageComponent: React.FC = () => {
         </div>
       </div>
       {/* Create Ad Modal */}
-      {isModalOpen && <CreateAdModal onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && <CreateAndBookCreativeModal onClose={() => setIsModalOpen(false)} />}
     </div>
   );
 };
