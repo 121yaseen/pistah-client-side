@@ -24,8 +24,8 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, invent
       <div
         className="bg-white dark:bg-gray-800 dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
         style={{
-          width: "60%",
-          maxHeight: "90%",
+          width: "50%",
+          height: "80%",
           overflow: "hidden",
         }}
       >
