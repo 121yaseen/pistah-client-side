@@ -14,7 +14,7 @@ const CreativePageComponent: React.FC = () => {
           <div className="w-full max-w-6xl">
             <div className="flex justify-end items-center mb-6 space-x-2">
               <span className="text-blue-500 text-2xl">
-                Add Creative
+                Create Campaign
               </span>
               <button
                 type="button"

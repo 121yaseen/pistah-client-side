@@ -2,7 +2,7 @@
 
 import React from "react";
 import DateRangePicker from "../shared/DateRangePicker";
-import { BookingSet, CreativeData } from "../shared/types/typeFile";
+import { BookingSet, CreativeData } from "../../../types/creativeTypeFile";
 
 type BookInventoryModalProps = {
   onClose: () => void;

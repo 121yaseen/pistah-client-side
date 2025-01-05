@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useToast } from "@/app/context/ToastContext";
 import { useLoader } from "../shared/LoaderComponent";
-import { CreativeData } from "../shared/types/typeFile";
+import { CreativeData } from "../../../types/creativeTypeFile";
 
 type CreateCreativeModalProps = {
   onClose: () => void;

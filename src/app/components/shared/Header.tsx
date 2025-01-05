@@ -149,7 +149,7 @@ export default function Header({ navLinks = [] }: HeaderProps) {
               className={`text-xs mt-1 group-hover:text-white ${pathname === "/creatives" ? "text-white" : "text-gray-400"
                 }`}
             >
-              My Creatives
+              My Campaigns
             </span>
           </Link>
 
