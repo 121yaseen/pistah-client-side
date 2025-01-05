@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import CreateCreativeModal from "./CreateCreativeModal";
-import { CreativeData } from "../shared/interface/creativeData";
+import { CreativeData } from "../shared/types/typeFile";
 import BookInventoryModal from "./BookInventoryModal";
 
 type CreateAndBookCreativeModalProps = {

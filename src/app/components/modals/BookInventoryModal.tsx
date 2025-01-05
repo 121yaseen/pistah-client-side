@@ -2,6 +2,7 @@
 
 import React from "react";
 import DateRangePicker from "../shared/DateRangePicker";
+import { BookingSet, CreativeData } from "../shared/types/typeFile";
 
 type BookInventoryModalProps = {
   onClose: () => void;
@@ -10,8 +11,47 @@ type BookInventoryModalProps = {
 };
 
 const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, inventoryId, creativeId }) => {
-  const [startDate, setStartDate] = React.useState<Date | null>(null);
-  const [endDate, setEndDate] = React.useState<Date | null>(null);
+  // Mock data for creatives
+  const creatives: CreativeData[] = [
+    {
+      creativeId: "2000",
+      title: "creative1",
+      downloadLink: "http://ex.com",
+      duration: "5",
+      thumbnailFile: null
+    },
+    {
+      creativeId: "3000",
+      title: "creative2",
+      downloadLink: "http:ex2.co",
+      duration: "20",
+      thumbnailFile: null
+    }
+  ];
+  // Mock data for inventory options
+  const inventoryOptions = [
+    { value: 'inv1', label: 'Inventory 1' },
+    { value: 'inv2', label: 'Inventory 2' },
+    { value: 'inv3', label: 'Inventory 3' },
+  ];
+
+  const [bookingSets, setBookingSets] = React.useState<BookingSet[]>([{
+    bookingId: crypto.randomUUID(),
+    inventoryId: inventoryId,
+    creativeId: creativeId,
+    startDate: null,
+    endDate: null,
+  }]);
+
+  const addNewSet = () => {
+    setBookingSets([...bookingSets, {
+      bookingId: crypto.randomUUID(),
+      inventoryId: inventoryId,
+      creativeId: creativeId,
+      startDate: null,
+      endDate: null,
+    }]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +62,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, invent
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
       <div
-        className="bg-white dark:bg-gray-800 dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
+        className="bg-white dark:bg-gray-800 text-gray-200 rounded-lg shadow-lg flex flex-col"
         style={{
           width: "50%",
           height: "80%",
@@ -30,30 +70,98 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, invent
         }}
       >
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 dark:text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
-          <h2 className="text-2xl font-bold">Book Advertisement Slot</h2>
+          <h2 className="text-2xl font-bold">Book Inventory</h2>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 scrollable-content">
           <form onSubmit={handleSubmit} id="bookingForm">
             <div className="mb-4">
               <label className="block text-sm font-medium mb-1 text-black dark:text-white">
-                Select Booking Dates
+                Select Creative
               </label>
-              <DateRangePicker
-                startDate={startDate}
-                endDate={endDate}
-                setStartDate={setStartDate}
-                setEndDate={setEndDate}
-                onTodayClick={() => {
-                  const today = new Date();
-                  setStartDate(today);
-                  setEndDate(today);
+              <select
+                className="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500"
+                value={creativeId}
+                onChange={(e) => {
+                  setBookingSets(bookingSets.map(s => ({
+                    ...s,
+                    creativeId: e.target.value
+                  })));
                 }}
-                showSearchIcon={false}
-                onSearch={() => { }}
-              />
+              >
+                <option value="">Select a creative</option>
+                {creatives.map(creative => (
+                  <option key={creative.creativeId} value={creative.creativeId}>
+                    {creative.title} ({creative.duration})
+                  </option>
+                ))}
+              </select>
             </div>
-            {/* Add more booking fields as needed */}
+
+            <div className="space-y-4">
+              {bookingSets.map((set) => (
+                <div key={set.bookingId} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-700">
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1 text-black dark:text-white">
+                      Select Inventory
+                    </label>
+                    <select
+                      className="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500"
+                      value={set.inventoryId}
+                      onChange={(e) => {
+                        setBookingSets(bookingSets.map(s =>
+                          s.bookingId === set.bookingId ? { ...s, inventory: e.target.value } : s
+                        ));
+                      }}
+                    >
+                      <option value="">Select an inventory</option>
+                      {inventoryOptions.map(option => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium mb-1 text-black dark:text-white">
+                      Select Booking Dates
+                    </label>
+                    <DateRangePicker
+                      startDate={set.startDate}
+                      endDate={set.endDate}
+                      setStartDate={(date) => {
+                        setBookingSets(bookingSets.map(s =>
+                          s.bookingId === set.bookingId ? { ...s, startDate: date } : s
+                        ));
+                      }}
+                      setEndDate={(date) => {
+                        setBookingSets(bookingSets.map(s =>
+                          s.bookingId === set.bookingId ? { ...s, endDate: date } : s
+                        ));
+                      }}
+                      onTodayClick={() => {
+                        const today = new Date();
+                        setBookingSets(bookingSets.map(s =>
+                          s.bookingId === set.bookingId ? { ...s, startDate: today, endDate: today } : s
+                        ));
+                      }}
+                      showSearchIcon={false}
+                      onSearch={() => { }}
+                    />
+                  </div>
+                </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={addNewSet}
+                className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700 dark:text-blue-400"
+              >
+
+                Add Another Booking
+              </button>
+            </div>
           </form>
         </div>
 
