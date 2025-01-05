@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import { useToast } from "@/app/context/ToastContext";
 import { useLoader } from "../shared/LoaderComponent";
-import { CreativeData } from "../shared/interface/creativeData";
+import { CreativeData } from "../shared/types/typeFile";
 
 type CreateCreativeModalProps = {
   onClose: () => void;
@@ -152,7 +152,7 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
         }}
       >
         {/* Header */}
-        <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 dark:text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
+        <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
           <h2 className="text-2xl font-bold">Add Creative</h2>
         </div>
 
@@ -270,7 +270,7 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded hover:bg-gray-400 bg-gray-600 dark:hover:bg-gray-500"
+            className="px-4 py-2 rounded hover:bg-gray-400 bg-gray-600 dark:hover:bg-gray-500 text-white"
             disabled={isSubmitting}
           >
             Cancel
