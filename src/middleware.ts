@@ -10,7 +10,7 @@ export async function middleware(req: NextRequest) {
     pathname.startsWith("/_next") ||
     pathname.startsWith("/register") ||
     pathname.startsWith("/login") ||
-    pathname.startsWith("/public")
+    pathname.includes("/_next/image")
   ) {
     return NextResponse.next();
   }
