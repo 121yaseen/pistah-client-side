@@ -4,10 +4,13 @@ import { AdBoard } from "@prisma/client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useLoader } from "./shared/LoaderComponent";
+import BookInventoryModal from "./modals/BookInventoryModal";
 
 export default function InventoryPageComponent() {
   const { showLoader, hideLoader } = useLoader();
   const [adBoards, setAdBoards] = useState<AdBoard[]>([]);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedAdBoardId, setSelectedAdBoardId] = useState<string>("");
 
   useEffect(() => {
     async function fetchAdBoards() {
@@ -58,7 +61,13 @@ export default function InventoryPageComponent() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Board Type: {adBoard.boardType}
                 </p>
-                <button className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600">
+                <button
+                  className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+                  onClick={() => {
+                    setSelectedAdBoardId(adBoard.id);
+                    setShowBookingModal(true);
+                  }}
+                >
                   Book Now
                 </button>
               </div>
@@ -66,6 +75,13 @@ export default function InventoryPageComponent() {
           ))}
         </div>
       </div>
+      {showBookingModal && (
+        <BookInventoryModal
+          onClose={() => setShowBookingModal(false)}
+          inventoryId={selectedAdBoardId}
+          creativeId={""}
+        />
+      )}
     </div>
   );
 }

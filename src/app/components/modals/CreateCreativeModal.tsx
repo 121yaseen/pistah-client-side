@@ -4,20 +4,25 @@ import React, { useState, useEffect } from "react";
 import { useToast } from "@/app/context/ToastContext";
 import DateRangePicker from "../shared/DateRangePicker";
 import { useLoader } from "../shared/LoaderComponent";
+import { CreativeData } from "../shared/interface/creativeData";
 
-type CreateAdModalProps = {
+type CreateCreativeModalProps = {
   onClose: () => void;
+  onCreativeCreated?: (creativeData: CreativeData) => void;
 };
 
-const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
+const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
+  onClose,
+  onCreativeCreated
+}) => {
   const { showLoader, hideLoader } = useLoader();
   const { addToast } = useToast();
 
-  const [adData, setAdData] = useState({
-    id: Date.now(),
+  const [adData, setAdData] = useState<CreativeData>({
+    creativeId: "",
     title: "",
     downloadLink: "",
-    adBoardId: "",
+    inventoryId: "",
     adDisplayStartDate: "",
     adDisplayEndDate: "",
     adDuration: "",
@@ -27,36 +32,13 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
 
-  const [adBoards, setAdBoards] = useState<{ id: number; name: string }[]>([]);
   const [errors, setErrors] = useState({
     title: false,
     downloadLink: false,
-    adBoardId: false,
     adDisplayStartDate: false,
     adDisplayEndDate: false,
     adDuration: false,
     thumbnailFile: false,
-  });
-
-  useEffect(() => {
-    const fetchAdBoards = async () => {
-      try {
-        const response = await fetch("/api/adBoard");
-        const data = await response.json();
-        const adBoards = data.map(
-          (board: { id: number; boardName: string }) => ({
-            id: board.id,
-            name: board.boardName,
-          })
-        );
-        setAdBoards(adBoards);
-      } catch (err) {
-        addToast("Something went wrong!", "error");
-        console.error("Error fetching ad boards:", err);
-      }
-    };
-
-    fetchAdBoards();
   });
 
   const validateURL = (url: string): boolean => {
@@ -103,7 +85,6 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
     const newErrors = {
       title: adData.title.trim() === "",
       downloadLink: !validateURL(adData.downloadLink),
-      adBoardId: adData.adBoardId === "",
       adDisplayStartDate: startDate === null,
       adDisplayEndDate: endDate === null,
       adDuration:
@@ -121,7 +102,6 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
     const formData = new FormData();
     formData.append("title", adData.title);
     formData.append("downloadLink", adData.downloadLink);
-    formData.append("adBoardId", adData.adBoardId);
     formData.append("adDisplayStartDate", startDate?.toDateString() ?? "");
     formData.append("adDisplayEndDate", endDate?.toDateString() ?? "");
     formData.append("adDuration", adData.adDuration);
@@ -131,17 +111,24 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
 
     try {
       showLoader();
-      const response = await fetch("/api/creatives", {
-        method: "POST",
-        body: formData,
-      });
 
-      if (response.ok) {
+      if (true) {
+        // Pass the creative data back to parent
+        if (onCreativeCreated) {
+          onCreativeCreated({
+            creativeId: adData.creativeId,
+            title: adData.title,
+            downloadLink: adData.downloadLink,
+            inventoryId: adData.inventoryId,
+            adDisplayStartDate: startDate?.toDateString() ?? "",
+            adDisplayEndDate: endDate?.toDateString() ?? "",
+            adDuration: adData.adDuration,
+            thumbnailFile: adData.thumbnailFile
+          });
+        }
+
         addToast("Creative added successfully in Dashboard!", "success");
         onClose();
-
-        // Reload Page
-        window.location.reload();
       } else {
         addToast("Something went wrong!", "error");
       }
@@ -184,9 +171,8 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
                 type="text"
                 value={adData.title}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 dark:border-gray-600 border-gray-300 text-black dark:text-gray-200 ${
-                  errors.title ? "border-red-500" : ""
-                }`}
+                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 dark:border-gray-600 border-gray-300 text-black dark:text-gray-200 ${errors.title ? "border-red-500" : ""
+                  }`}
                 placeholder="Title"
                 required
               />
@@ -210,7 +196,7 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
                   setEndDate(today);
                 }}
                 showSearchIcon={false}
-                onSearch={() => {}}
+                onSearch={() => { }}
               />
               {errors.adDisplayStartDate ||
                 (errors.adDisplayEndDate && (
@@ -233,9 +219,8 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
                 type="url"
                 value={adData.downloadLink}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 text-black dark:border-gray-600 dark:text-gray-200 ${
-                  errors.downloadLink ? "border-red-500" : ""
-                }`}
+                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 text-black dark:border-gray-600 dark:text-gray-200 ${errors.downloadLink ? "border-red-500" : ""
+                  }`}
                 placeholder="Link to download"
                 required
               />
@@ -271,39 +256,6 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
             <div className="mb-4">
               <label
                 className="block text-sm font-medium mb-1 text-black dark:text-white"
-                htmlFor="adBoardId"
-              >
-                Display on Ad Board
-              </label>
-              <select
-                id="adBoardId"
-                name="adBoardId"
-                value={adData.adBoardId}
-                onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded bg-gray-100 border-gray-300 text-black dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ${
-                  errors.adBoardId ? "border-red-500" : ""
-                }`}
-                required
-              >
-                <option value="" disabled>
-                  Select an ad board
-                </option>
-                {adBoards.map((board) => (
-                  <option key={board.id} value={board.id.toString()}>
-                    {board.name}
-                  </option>
-                ))}
-              </select>
-              {errors.adBoardId && (
-                <p className="text-red-500 text-sm mt-1">
-                  Ad board selection is required
-                </p>
-              )}
-            </div>
-
-            <div className="mb-4">
-              <label
-                className="block text-sm font-medium mb-1 text-black dark:text-white"
                 htmlFor="adDuration"
               >
                 Duration (seconds)
@@ -314,9 +266,8 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
                 type="number"
                 value={adData.adDuration}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-gray-100 border-gray-300 text-black border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ${
-                  errors.adDuration ? "border-red-500" : ""
-                }`}
+                className={`w-full px-3 py-2 bg-gray-100 border-gray-300 text-black border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ${errors.adDuration ? "border-red-500" : ""
+                  }`}
                 placeholder="Enter duration in seconds"
                 required
               />
@@ -351,4 +302,4 @@ const CreateAdModal: React.FC<CreateAdModalProps> = ({ onClose }) => {
   );
 };
 
-export default CreateAdModal;
+export default CreateCreativeModal;
