@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useToast } from "@/app/context/ToastContext";
-import DateRangePicker from "../shared/DateRangePicker";
 import { useLoader } from "../shared/LoaderComponent";
 import { CreativeData } from "../shared/interface/creativeData";
 
@@ -11,55 +10,63 @@ type CreateCreativeModalProps = {
   onCreativeCreated?: (creativeData: CreativeData) => void;
 };
 
-const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
-  onClose,
-  onCreativeCreated
-}) => {
+const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreativeCreated }) => {
   const { showLoader, hideLoader } = useLoader();
   const { addToast } = useToast();
-
-  const [adData, setAdData] = useState<CreativeData>({
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [creativeData, setCreativeData] = useState<CreativeData>({
     creativeId: "",
     title: "",
     downloadLink: "",
-    inventoryId: "",
-    adDisplayStartDate: "",
-    adDisplayEndDate: "",
-    adDuration: "",
+    duration: "",
     thumbnailFile: null as File | null,
   });
-
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
 
   const [errors, setErrors] = useState({
     title: false,
     downloadLink: false,
-    adDisplayStartDate: false,
-    adDisplayEndDate: false,
-    adDuration: false,
+    duration: false,
     thumbnailFile: false,
   });
 
   const validateURL = (url: string): boolean => {
+    if (!url) return false;
     try {
-      new URL(url);
-      return true;
+      const parsedUrl = new URL(url);
+      return ['http:', 'https:'].includes(parsedUrl.protocol);
     } catch {
       return false;
     }
   };
 
+  const validateDuration = (duration: string): boolean => {
+    const durationNum = Number(duration);
+    return !isNaN(durationNum) && durationNum > 0;
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        setErrors((prevErrors) => ({ ...prevErrors, thumbnailFile: true }));
-      } else {
-        setAdData((prevData) => ({ ...prevData, thumbnailFile: file }));
-        setErrors((prevErrors) => ({ ...prevErrors, thumbnailFile: false }));
-      }
+    if (!file) {
+      setErrors(prev => ({ ...prev, thumbnailFile: true }));
+      return;
     }
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setErrors(prev => ({ ...prev, thumbnailFile: true }));
+      addToast("Please upload an image file", "error");
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors(prev => ({ ...prev, thumbnailFile: true }));
+      addToast("File size must be less than 5MB", "error");
+      return;
+    }
+
+    setCreativeData(prev => ({ ...prev, thumbnailFile: file }));
+    setErrors(prev => ({ ...prev, thumbnailFile: false }));
   };
 
   const handleChange = (
@@ -68,12 +75,12 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
     >
   ) => {
     const { name, value } = e.target;
-    setAdData((prevData) => ({
-      ...prevData,
-      [name]: value,
+    setCreativeData(prev => ({
+      ...prev,
+      [name]: value.trim(),
     }));
-    setErrors((prevErrors) => ({
-      ...prevErrors,
+    setErrors(prev => ({
+      ...prev,
       [name]: false,
     }));
   };
@@ -81,61 +88,55 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (isSubmitting) {
+      return;
+    }
+
     // Validate fields
     const newErrors = {
-      title: adData.title.trim() === "",
-      downloadLink: !validateURL(adData.downloadLink),
-      adDisplayStartDate: startDate === null,
-      adDisplayEndDate: endDate === null,
-      adDuration:
-        isNaN(Number(adData.adDuration)) || Number(adData.adDuration) <= 0,
-      thumbnailFile: !adData.thumbnailFile || errors.thumbnailFile,
+      title: !creativeData.title.trim(),
+      downloadLink: !validateURL(creativeData.downloadLink),
+      duration: !validateDuration(creativeData.duration),
+      thumbnailFile: !creativeData.thumbnailFile,
     };
 
     setErrors(newErrors);
 
-    if (Object.values(newErrors).some((error) => error)) {
-      addToast("Please check the entered fields", "error");
+    if (Object.values(newErrors).some(error => error)) {
+      addToast("Please check all required fields", "error");
       return;
     }
 
     const formData = new FormData();
-    formData.append("title", adData.title);
-    formData.append("downloadLink", adData.downloadLink);
-    formData.append("adDisplayStartDate", startDate?.toDateString() ?? "");
-    formData.append("adDisplayEndDate", endDate?.toDateString() ?? "");
-    formData.append("adDuration", adData.adDuration);
-    if (adData.thumbnailFile) {
-      formData.append("thumbnail", adData.thumbnailFile);
+    formData.append("title", creativeData.title.trim());
+    formData.append("downloadLink", creativeData.downloadLink);
+    formData.append("duration", creativeData.duration);
+    if (creativeData.thumbnailFile) {
+      formData.append("thumbnail", creativeData.thumbnailFile);
     }
 
     try {
+      setIsSubmitting(true);
       showLoader();
 
-      if (true) {
-        // Pass the creative data back to parent
-        if (onCreativeCreated) {
-          onCreativeCreated({
-            creativeId: adData.creativeId,
-            title: adData.title,
-            downloadLink: adData.downloadLink,
-            inventoryId: adData.inventoryId,
-            adDisplayStartDate: startDate?.toDateString() ?? "",
-            adDisplayEndDate: endDate?.toDateString() ?? "",
-            adDuration: adData.adDuration,
-            thumbnailFile: adData.thumbnailFile
-          });
-        }
+      // Here you would typically make an API call to create the creative
+      // For now, simulating with a success case
+      const creativeId = "123"; // Temporary ID generation
 
-        addToast("Creative added successfully in Dashboard!", "success");
-        onClose();
-      } else {
-        addToast("Something went wrong!", "error");
+      if (onCreativeCreated) {
+        onCreativeCreated({
+          ...creativeData,
+          creativeId,
+        });
       }
+
+      addToast("Creative added successfully!", "success");
+      onClose();
     } catch (error) {
-      addToast("Something went wrong!", "error");
-      console.error("Error creating ad:", error);
+      console.error("Error creating creative:", error);
+      addToast("Failed to create creative", "error");
     } finally {
+      setIsSubmitting(false);
       hideLoader();
     }
   };
@@ -145,8 +146,8 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
       <div
         className="bg-white dark:bg-gray-800 dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
         style={{
-          width: "60%",
-          maxHeight: "90%",
+          width: "50%",
+          height: "80%",
           overflow: "hidden",
         }}
       >
@@ -157,23 +158,25 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
 
         {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-4 scrollable-content">
-          <form onSubmit={handleSubmit} id="createAdForm">
+          <form onSubmit={handleSubmit} id="createCreativeForm">
             <div className="mb-4">
               <label
                 className="block text-sm font-medium mb-1 text-black dark:text-white"
                 htmlFor="title"
               >
-                Title
+                Title <span className="text-red-500">*</span>
               </label>
               <input
                 id="title"
                 name="title"
                 type="text"
-                value={adData.title}
+                value={creativeData.title}
                 onChange={handleChange}
                 className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 dark:border-gray-600 border-gray-300 text-black dark:text-gray-200 ${errors.title ? "border-red-500" : ""
                   }`}
-                placeholder="Title"
+                placeholder="Enter creative title"
+                maxLength={100}
+                disabled={isSubmitting}
                 required
               />
               {errors.title && (
@@ -182,51 +185,27 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1 text-black dark:text-white">
-                Display Dates
-              </label>
-              <DateRangePicker
-                startDate={startDate}
-                endDate={endDate}
-                setStartDate={setStartDate}
-                setEndDate={setEndDate}
-                onTodayClick={() => {
-                  const today = new Date();
-                  setStartDate(today);
-                  setEndDate(today);
-                }}
-                showSearchIcon={false}
-                onSearch={() => { }}
-              />
-              {errors.adDisplayStartDate ||
-                (errors.adDisplayEndDate && (
-                  <p className="text-red-500 text-sm mt-1">
-                    Please select valid dates
-                  </p>
-                ))}
-            </div>
-
-            <div className="mb-4">
               <label
                 className="block text-sm font-medium mb-1 text-black dark:text-white"
                 htmlFor="downloadLink"
               >
-                Download Link
+                Download Link <span className="text-red-500">*</span>
               </label>
               <input
                 id="downloadLink"
                 name="downloadLink"
                 type="url"
-                value={adData.downloadLink}
+                value={creativeData.downloadLink}
                 onChange={handleChange}
                 className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 text-black dark:border-gray-600 dark:text-gray-200 ${errors.downloadLink ? "border-red-500" : ""
                   }`}
-                placeholder="Link to download"
+                placeholder="https://example.com/video"
+                disabled={isSubmitting}
                 required
               />
               {errors.downloadLink && (
                 <p className="text-red-500 text-sm mt-1">
-                  Invalid download link URL
+                  Please enter a valid HTTP(S) URL
                 </p>
               )}
             </div>
@@ -236,7 +215,7 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
                 className="block text-sm font-medium mb-1 text-black dark:text-white"
                 htmlFor="thumbnail"
               >
-                Thumbnail (Max 5MB)
+                Thumbnail <span className="text-red-500">*</span> (Max 5MB)
               </label>
               <input
                 id="thumbnail"
@@ -244,11 +223,14 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                className="w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 dark:border-gray-600 dark:text-gray-200"
+                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 dark:border-gray-600 dark:text-gray-200 ${errors.thumbnailFile ? "border-red-500" : ""
+                  }`}
+                disabled={isSubmitting}
+                required
               />
               {errors.thumbnailFile && (
                 <p className="text-red-500 text-sm mt-1">
-                  Please upload an image less than 5MB
+                  Please upload a valid image file (max 5MB)
                 </p>
               )}
             </div>
@@ -256,24 +238,27 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
             <div className="mb-4">
               <label
                 className="block text-sm font-medium mb-1 text-black dark:text-white"
-                htmlFor="adDuration"
+                htmlFor="duration"
               >
-                Duration (seconds)
+                Duration <span className="text-red-500">*</span> (seconds)
               </label>
               <input
-                id="adDuration"
-                name="adDuration"
+                id="duration"
+                name="duration"
                 type="number"
-                value={adData.adDuration}
+                value={creativeData.duration}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-gray-100 border-gray-300 text-black border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ${errors.adDuration ? "border-red-500" : ""
+                className={`w-full px-3 py-2 bg-gray-100 border-gray-300 text-black border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ${errors.duration ? "border-red-500" : ""
                   }`}
-                placeholder="Enter duration in seconds"
+                placeholder="Enter duration"
+                min="1"
+                max="300"
+                disabled={isSubmitting}
                 required
               />
-              {errors.adDuration && (
+              {errors.duration && (
                 <p className="text-red-500 text-sm mt-1">
-                  Enter a positive number
+                  Duration must be between 1 and 300 seconds
                 </p>
               )}
             </div>
@@ -286,13 +271,15 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
             type="button"
             onClick={onClose}
             className="px-4 py-2 rounded hover:bg-gray-400 bg-gray-600 dark:hover:bg-gray-500"
+            disabled={isSubmitting}
           >
             Cancel
           </button>
           <button
             type="submit"
-            form="createAdForm"
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600"
+            form="createCreativeForm"
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isSubmitting}
           >
             Add
           </button>

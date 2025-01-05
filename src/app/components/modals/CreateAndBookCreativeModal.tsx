@@ -12,14 +12,11 @@ type CreateAndBookCreativeModalProps = {
 const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({ onClose }) => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(true);
-    const [creativeData, setCreativeData] = useState<CreativeData>({
+  const [creativeData, setCreativeData] = useState<CreativeData>({
     creativeId: "",
     title: "",
     downloadLink: "",
-    inventoryId: "",
-    adDisplayStartDate: "",
-    adDisplayEndDate: "",
-    adDuration: "",
+    duration: "",
     thumbnailFile: null as File | null,
   });
 
@@ -48,7 +45,7 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
       {showBookingModal && (
         <BookInventoryModal
           onClose={handleBookingModalClose}
-          inventoryId={creativeData.inventoryId}
+          inventoryId={""}
           creativeId={creativeData.creativeId}
         />
       )}
