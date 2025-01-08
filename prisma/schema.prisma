@@ -1,79 +1,115 @@
 datasource db {
-  provider = "mongodb"
-  url      = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL") // e.g. "postgresql://user:password@localhost:5432/mydb"
 }
 
 generator client {
   provider = "prisma-client-js"
 }
 
-model Ad {
-  id                 String   @id @default(auto()) @map("_id") @db.ObjectId
-  title              String
-  downloadLink       String
-  adBoardId          String   @db.ObjectId
-  adDisplayStartDate DateTime
-  adDisplayEndDate   DateTime
-  adDuration         String
-  thumbnailUrl       String
-  createdById        String   @db.ObjectId
-  createdUser        User     @relation(fields: [createdById], references: [id])
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  // This need to be updated on enable features centered on ads such as ad editing, ad deletion, ad display status
-  adBoard            AdBoard  @relation("AdToAdBoard", fields: [adBoardId], references: [id], onDelete: Cascade)
-}
-
-model AdBoard {
-  id                  String   @id @default(auto()) @map("_id") @db.ObjectId
-  boardName           String
-  location            String
-  dimensions          String
-  boardType           String
-  isAvailable         Boolean
-  dailyRate           Float
-  operationalHours    String
-  ownerContact        String
-  lastMaintenanceDate DateTime
-  createdById         String   @db.ObjectId
-  createdUser         User     @relation(fields: [createdById], references: [id])
-  imageUrl            String   @default("")
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  ads                 Ad[]     @relation("AdToAdBoard")
-}
-
+/**
+ * Model: User
+ * - Stores both normal users and ad board owners.
+ */
 model User {
-  id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  name          String
-  email         String    @unique
-  password      String?
-  profilePicUrl String?   @default("")
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  accounts      Account[]
-  Company       Company?
-  Ad            Ad[]
-  AdBoard       AdBoard[]
-}
-
-model Account {
-  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
-  userId             String    @db.ObjectId
-  provider           String
-  providerAccountId  String
-  refreshToken       String?
-  accessToken        String?
-  accessTokenExpires DateTime?
-
-  user User @relation(fields: [userId], references: [id])
-}
-
-model Company {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    Int      @id @default(autoincrement())
   name      String
+  email     String   @unique
+  password  String
+  role      String // e.g. "USER" or "OWNER"
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  userid    String   @unique @db.ObjectId
-  user      User     @relation(fields: [userid], references: [id])
+
+  // Relations
+  ads      Ad[]      @relation("UserAds")
+  adBoards AdBoard[] @relation("UserAdBoards")
+  bookings Booking[] @relation("UserBookings")
+}
+
+/**
+ * Model: Ad
+ * - Includes the new fields: downloadLink, thumbnailUrl
+ * - adType can be 'ONLINE' or 'OFFLINE' if needed.
+ */
+model Ad {
+  adId         Int     @id @default(autoincrement())
+  createdBy    Int
+  title        String
+  description  String?
+  adType       String?
+  downloadLink String?
+  thumbnailUrl String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user     User      @relation("UserAds", fields: [createdBy], references: [userId])
+  bookings Booking[]
+}
+
+/**
+ * Model: AdBoard
+ * - Includes the new fields: boardName, boardLength, boardWidth, dailyRate,
+ * operationalHours, thumbnailUrl
+ */
+model AdBoard {
+  adBoardId        Int     @id @default(autoincrement())
+  ownerId          Int
+  location         String
+  description      String?
+  defaultCapacity  Int     @default(10)
+  boardName        String // NEW FIELD
+  boardLength      Float? // NEW FIELD
+  boardWidth       Float? // NEW FIELD
+  dailyRate        Float? // NEW FIELD
+  operationalHours String? // NEW FIELD
+  thumbnailUrl     String? // NEW FIELD
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  owner               User                @relation("UserAdBoards", fields: [ownerId], references: [userId])
+  bookings            Booking[]           @relation("AdBoardBookings")
+  boardAvailabilities BoardAvailability[] @relation("AdBoardAvailabilities")
+}
+
+/**
+ * Model: BoardAvailability
+ * - Optional table if you need to store custom per-day capacity or closures.
+ */
+model BoardAvailability {
+  boardAvailId Int      @id @default(autoincrement())
+  adBoardId    Int
+  date         DateTime
+  capacity     Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  adBoard AdBoard @relation("AdBoardAvailabilities", fields: [adBoardId], references: [adBoardId])
+}
+
+/**
+ * Model: Booking
+ * - Ties a user, an ad, and an ad board together over a date range.
+ */
+model Booking {
+  bookingId Int      @id @default(autoincrement())
+  userId    Int
+  adId      Int
+  adBoardId Int
+  startDate DateTime
+  endDate   DateTime
+  status    String?  @default("PENDING")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user    User    @relation("UserBookings", fields: [userId], references: [userId])
+  ad      Ad      @relation(fields: [adId], references: [adId])
+  adBoard AdBoard @relation("AdBoardBookings", fields: [adBoardId], references: [adBoardId])
 }
