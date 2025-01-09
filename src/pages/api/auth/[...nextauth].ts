@@ -59,7 +59,7 @@ export default NextAuth({
         }
 
         // Return user object to be stored in the token
-        return { id: user.id, name: user.name, email: user.email };
+        return { id: user.userId, name: user.name, email: user.email };
       },
     }),
   ],

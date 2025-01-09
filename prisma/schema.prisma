@@ -12,7 +12,7 @@ generator client {
  * - Stores both normal users and ad board owners.
  */
 model User {
-  userId    Int      @id @default(autoincrement())
+  userId    String   @id @default(cuid())
   name      String
   email     String   @unique
   password  String
@@ -24,6 +24,7 @@ model User {
   ads      Ad[]      @relation("UserAds")
   adBoards AdBoard[] @relation("UserAdBoards")
   bookings Booking[] @relation("UserBookings")
+  accounts Account[] @relation("UserAccounts")
 }
 
 /**
@@ -32,13 +33,14 @@ model User {
  * - adType can be 'ONLINE' or 'OFFLINE' if needed.
  */
 model Ad {
-  adId         Int     @id @default(autoincrement())
-  createdBy    Int
+  adId         String  @id @default(cuid())
+  createdBy    String
   title        String
-  description  String?
-  adType       String?
+  // description  String?
+  // adType       String?
   downloadLink String?
   thumbnailUrl String?
+  duration     Int
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -54,8 +56,8 @@ model Ad {
  * operationalHours, thumbnailUrl
  */
 model AdBoard {
-  adBoardId        Int     @id @default(autoincrement())
-  ownerId          Int
+  adBoardId        String  @id @default(cuid())
+  ownerId          String
   location         String
   description      String?
   defaultCapacity  Int     @default(10)
@@ -80,8 +82,8 @@ model AdBoard {
  * - Optional table if you need to store custom per-day capacity or closures.
  */
 model BoardAvailability {
-  boardAvailId Int      @id @default(autoincrement())
-  adBoardId    Int
+  boardAvailId String   @id @default(cuid())
+  adBoardId    String
   date         DateTime
   capacity     Int?
 
@@ -97,10 +99,10 @@ model BoardAvailability {
  * - Ties a user, an ad, and an ad board together over a date range.
  */
 model Booking {
-  bookingId Int      @id @default(autoincrement())
-  userId    Int
-  adId      Int
-  adBoardId Int
+  bookingId String   @id @default(cuid())
+  userId    String
+  adId      String
+  adBoardId String
   startDate DateTime
   endDate   DateTime
   status    String?  @default("PENDING")
@@ -112,4 +114,16 @@ model Booking {
   user    User    @relation("UserBookings", fields: [userId], references: [userId])
   ad      Ad      @relation(fields: [adId], references: [adId])
   adBoard AdBoard @relation("AdBoardBookings", fields: [adBoardId], references: [adBoardId])
+}
+
+model Account {
+  id                 String    @id @default(cuid())
+  userId             String
+  provider           String
+  providerAccountId  String
+  refreshToken       String?
+  accessToken        String?
+  accessTokenExpires DateTime?
+
+  user User @relation("UserAccounts", fields: [userId], references: [userId])
 }

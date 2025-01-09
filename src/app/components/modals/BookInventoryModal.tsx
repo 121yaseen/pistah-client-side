@@ -2,7 +2,7 @@
 
 import React from "react";
 import DateRangePicker from "../shared/DateRangePicker";
-import { BookingSet, CreativeData } from "../../../types/creativeTypeFile";
+import { Ad, Booking } from "@/types/interface";
 
 type BookInventoryModalProps = {
   onClose: () => void;
@@ -10,48 +10,65 @@ type BookInventoryModalProps = {
   creativeId: string;
 };
 
-const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, inventoryId, creativeId }) => {
+const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
+  onClose,
+  inventoryId,
+  creativeId,
+}) => {
   // Mock data for creatives
-  const creatives: CreativeData[] = [
-    {
-      creativeId: "2000",
-      title: "creative1",
-      downloadLink: "http://ex.com",
-      duration: "5",
-      thumbnailFile: null
-    },
-    {
-      creativeId: "3000",
-      title: "creative2",
-      downloadLink: "http:ex2.co",
-      duration: "20",
-      thumbnailFile: null
-    }
-  ];
-  // Mock data for inventory options
-  const inventoryOptions = [
-    { value: 'inv1', label: 'Inventory 1' },
-    { value: 'inv2', label: 'Inventory 2' },
-    { value: 'inv3', label: 'Inventory 3' },
-  ];
+  // const creatives: Ad[] = [
+  //   {
+  //     id: "2000",
+  //     title: "creative1",
+  //     downloadLink: "http://ex.com",
+  //     thumbnailUrl: "",
+  //     createdBy: "", // Add missing properties
+  //     description: "",
+  //     adType: "video",
+  //   },
+  //   {
+  //     id: "2001",
+  //     title: "creative1",
+  //     downloadLink: "http://ex.com",
+  //     thumbnailURL: "",
+  //     createdBy: "", // Add missing properties
+  //     description: "",
+  //     adType: "video",
+  //   },
+  // ];
+  // // Mock data for inventory options
+  // const inventoryOptions = [
+  //   { value: "inv1", label: "Inventory 1" },
+  //   { value: "inv2", label: "Inventory 2" },
+  //   { value: "inv3", label: "Inventory 3" },
+  // ];
 
-  const [bookingSets, setBookingSets] = React.useState<BookingSet[]>([{
-    bookingId: crypto.randomUUID(),
-    inventoryId: inventoryId,
-    creativeId: creativeId,
-    startDate: null,
-    endDate: null,
-  }]);
+  // const [bookingSets, setBookingSets] = React.useState<Booking[]>([
+  //   {
+  //     bookingId: crypto.randomUUID(),
+  //     adBoardId: inventoryId,
+  //     adId: creativeId,
+  //     startDate: "null",
+  //     endDate: "null",
+  //     userId: "", // Add missing properties
+  //     status: "pending",
+  //   },
+  // ]);
 
-  const addNewSet = () => {
-    setBookingSets([...bookingSets, {
-      bookingId: crypto.randomUUID(),
-      inventoryId: inventoryId,
-      creativeId: creativeId,
-      startDate: null,
-      endDate: null,
-    }]);
-  };
+  // const addNewSet = () => {
+  //   setBookingSets([
+  //     ...bookingSets,
+  //     {
+  //       bookingId: crypto.randomUUID(),
+  //       adBoardId: inventoryId,
+  //       adId: creativeId,
+  //       startDate: "", // Changed from null to empty string
+  //       endDate: "", // Changed from null to empty string
+  //       userId: "",
+  //       status: "pending",
+  //     },
+  //   ]);
+  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,7 +78,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, invent
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div
+      {/* <div
         className="bg-white dark:bg-gray-800 text-gray-200 rounded-lg shadow-lg flex flex-col"
         style={{
           width: "50%",
@@ -83,16 +100,18 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, invent
                 className="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500"
                 value={creativeId}
                 onChange={(e) => {
-                  setBookingSets(bookingSets.map(s => ({
-                    ...s,
-                    creativeId: e.target.value
-                  })));
+                  setBookingSets(
+                    bookingSets.map((s) => ({
+                      ...s,
+                      creativeId: e.target.value,
+                    }))
+                  );
                 }}
               >
                 <option value="">Select a creative</option>
-                {creatives.map(creative => (
-                  <option key={creative.creativeId} value={creative.creativeId}>
-                    {creative.title} ({creative.duration})
+                {creatives.map((creative) => (
+                  <option key={creative.id} value={creative.id}>
+                    {creative.title} ({creative.adType})
                   </option>
                 ))}
               </select>
@@ -100,7 +119,10 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, invent
 
             <div className="space-y-4">
               {bookingSets.map((set) => (
-                <div key={set.bookingId} className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-700">
+                <div
+                  key={set.bookingId}
+                  className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-700"
+                >
                   <div className="mb-4">
                     <label className="block text-sm font-medium mb-1 text-black dark:text-white">
                       Select Inventory
@@ -109,13 +131,17 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, invent
                       className="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500"
                       value={set.inventoryId}
                       onChange={(e) => {
-                        setBookingSets(bookingSets.map(s =>
-                          s.bookingId === set.bookingId ? { ...s, inventory: e.target.value } : s
-                        ));
+                        setBookingSets(
+                          bookingSets.map((s) =>
+                            s.bookingId === set.bookingId
+                              ? { ...s, inventory: e.target.value }
+                              : s
+                          )
+                        );
                       }}
                     >
                       <option value="">Select an inventory</option>
-                      {inventoryOptions.map(option => (
+                      {inventoryOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
                         </option>
@@ -131,23 +157,35 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, invent
                       startDate={set.startDate}
                       endDate={set.endDate}
                       setStartDate={(date) => {
-                        setBookingSets(bookingSets.map(s =>
-                          s.bookingId === set.bookingId ? { ...s, startDate: date } : s
-                        ));
+                        setBookingSets(
+                          bookingSets.map((s) =>
+                            s.bookingId === set.bookingId
+                              ? { ...s, startDate: date }
+                              : s
+                          )
+                        );
                       }}
                       setEndDate={(date) => {
-                        setBookingSets(bookingSets.map(s =>
-                          s.bookingId === set.bookingId ? { ...s, endDate: date } : s
-                        ));
+                        setBookingSets(
+                          bookingSets.map((s) =>
+                            s.bookingId === set.bookingId
+                              ? { ...s, endDate: date }
+                              : s
+                          )
+                        );
                       }}
                       onTodayClick={() => {
                         const today = new Date();
-                        setBookingSets(bookingSets.map(s =>
-                          s.bookingId === set.bookingId ? { ...s, startDate: today, endDate: today } : s
-                        ));
+                        setBookingSets(
+                          bookingSets.map((s) =>
+                            s.bookingId === set.bookingId
+                              ? { ...s, startDate: today, endDate: today }
+                              : s
+                          )
+                        );
                       }}
                       showSearchIcon={false}
-                      onSearch={() => { }}
+                      onSearch={() => {}}
                     />
                   </div>
                 </div>
@@ -158,7 +196,6 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, invent
                 onClick={addNewSet}
                 className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700 dark:text-blue-400"
               >
-
                 Add Another Booking
               </button>
             </div>
@@ -181,7 +218,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({ onClose, invent
             Book Now
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

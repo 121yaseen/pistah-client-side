@@ -1,25 +1,27 @@
-import { createAdAsync, getAds } from "@/repositories/adRepository";
-import { getAdBoards } from "@/repositories/adBoardRepository";
-import { Ad } from "@/types/ad";
-import { User } from "@/types/user";
+// import { createAdAsync, getAds } from "@/repositories/adRepository";
+// import { getAdBoards } from "@/repositories/adBoardRepository";
+// import { Ad } from "@/types/ad";
+// import { User } from "@/types/user";
+
+import { getAdsByUser } from "@/repositories/adRepository";
+import { createAdAsync } from "@/repositories/adRepository";
+import { Ad, User } from "@/types/interface";
 
 export const fetchFilteredAds = async (
-  startDate: string,
-  endDate: string,
-  createdUser: User
-) => {
-  let ads = await getAds(startDate, endDate);
-  const adBoards = await getAdBoards(createdUser);
-
-  ads = ads.filter((ad) => adBoards.some((board) => board.id == ad.adBoardId));
-
-  const filteredAds = ads.map((ad) => {
-    const adBoard = adBoards.find((board) => board.id == ad.adBoardId);
-    return { ...ad, adBoard: adBoard || undefined };
-  });
-  return filteredAds;
+  createdUserId: string
+): Promise<Ad[]> => {
+  const ads = await getAdsByUser(createdUserId);
+  return ads.map((ad) => ({
+    id: ad.adId,
+    createdBy: ad.createdBy,
+    title: ad.title,
+    downloadLink: ad.downloadLink || "",
+    thumbnailUrl: ad.thumbnailUrl || "",
+    thumbnailFile: undefined,
+    duration: ad.duration,
+  }));
 };
 
-export const createAd = async (adData: Ad, createdUser: User) => {
-  await createAdAsync(adData, createdUser);
+export const createAd = async (ad: Ad, user: User) => {
+  return await createAdAsync(ad, user);
 };

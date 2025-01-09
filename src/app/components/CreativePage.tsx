@@ -8,14 +8,12 @@ const CreativePageComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <div className="w-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
       <div className="container mx-auto py-10">
         <div className="flex justify-center">
           <div className="w-full max-w-6xl">
             <div className="flex justify-end items-center mb-6 space-x-2">
-              <span className="text-blue-500 text-2xl">
-                Create Campaign
-              </span>
+              <span className="text-blue-500 text-2xl">Create Campaign</span>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
@@ -28,7 +26,9 @@ const CreativePageComponent: React.FC = () => {
         </div>
       </div>
       {/* Create Ad Modal */}
-      {isModalOpen && <CreateAndBookCreativeModal onClose={() => setIsModalOpen(false)} />}
+      {isModalOpen && (
+        <CreateAndBookCreativeModal onClose={() => setIsModalOpen(false)} />
+      )}
     </div>
   );
 };

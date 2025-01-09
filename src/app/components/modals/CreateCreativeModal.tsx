@@ -3,23 +3,29 @@
 import React, { useState } from "react";
 import { useToast } from "@/app/context/ToastContext";
 import { useLoader } from "../shared/LoaderComponent";
-import { CreativeData } from "../../../types/creativeTypeFile";
+import { Ad } from "@/types/interface";
+// import { CreativeData } from "../../../types/creativeTypeFile";
 
 type CreateCreativeModalProps = {
   onClose: () => void;
-  onCreativeCreated?: (creativeData: CreativeData) => void;
+  onCreativeCreated?: (creativeData: Ad) => void;
 };
 
-const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreativeCreated }) => {
+const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
+  onClose,
+  onCreativeCreated,
+}) => {
   const { showLoader, hideLoader } = useLoader();
   const { addToast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [creativeData, setCreativeData] = useState<CreativeData>({
-    creativeId: "",
+  const [creativeData, setCreativeData] = useState<Ad>({
+    id: "",
     title: "",
     downloadLink: "",
-    duration: "",
-    thumbnailFile: null as File | null,
+    duration: 0,
+    thumbnailFile: null as unknown as File | undefined,
+    createdBy: "",
+    thumbnailUrl: "",
   });
 
   const [errors, setErrors] = useState({
@@ -33,13 +39,13 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
     if (!url) return false;
     try {
       const parsedUrl = new URL(url);
-      return ['http:', 'https:'].includes(parsedUrl.protocol);
+      return ["http:", "https:"].includes(parsedUrl.protocol);
     } catch {
       return false;
     }
   };
 
-  const validateDuration = (duration: string): boolean => {
+  const validateDuration = (duration: number): boolean => {
     const durationNum = Number(duration);
     return !isNaN(durationNum) && durationNum > 0;
   };
@@ -47,26 +53,26 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) {
-      setErrors(prev => ({ ...prev, thumbnailFile: true }));
+      setErrors((prev) => ({ ...prev, thumbnailFile: true }));
       return;
     }
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
-      setErrors(prev => ({ ...prev, thumbnailFile: true }));
+    if (!file.type.startsWith("image/")) {
+      setErrors((prev) => ({ ...prev, thumbnailFile: true }));
       addToast("Please upload an image file", "error");
       return;
     }
 
     // Validate file size (5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setErrors(prev => ({ ...prev, thumbnailFile: true }));
+      setErrors((prev) => ({ ...prev, thumbnailFile: true }));
       addToast("File size must be less than 5MB", "error");
       return;
     }
 
-    setCreativeData(prev => ({ ...prev, thumbnailFile: file }));
-    setErrors(prev => ({ ...prev, thumbnailFile: false }));
+    setCreativeData((prev) => ({ ...prev, thumbnailFile: file }));
+    setErrors((prev) => ({ ...prev, thumbnailFile: false }));
   };
 
   const handleChange = (
@@ -75,11 +81,11 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
     >
   ) => {
     const { name, value } = e.target;
-    setCreativeData(prev => ({
+    setCreativeData((prev) => ({
       ...prev,
       [name]: value.trim(),
     }));
-    setErrors(prev => ({
+    setErrors((prev) => ({
       ...prev,
       [name]: false,
     }));
@@ -102,32 +108,35 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
 
     setErrors(newErrors);
 
-    if (Object.values(newErrors).some(error => error)) {
+    if (Object.values(newErrors).some((error) => error)) {
       addToast("Please check all required fields", "error");
       return;
     }
 
     const formData = new FormData();
-    formData.append("title", creativeData.title.trim());
+    formData.append("title", creativeData.title);
     formData.append("downloadLink", creativeData.downloadLink);
-    formData.append("duration", creativeData.duration);
+    formData.append("duration", creativeData.duration.toString());
     if (creativeData.thumbnailFile) {
-      formData.append("thumbnail", creativeData.thumbnailFile);
+      formData.append("thumbnailFile", creativeData.thumbnailFile);
     }
 
     try {
       setIsSubmitting(true);
       showLoader();
+      const response = await fetch("/api/creative", {
+        method: "POST",
+        body: formData,
+      });
 
-      // Here you would typically make an API call to create the creative
-      // For now, simulating with a success case
-      const creativeId = "123"; // Temporary ID generation
+      if (!response.ok) {
+        throw new Error("Failed to create creative");
+      }
+
+      const createdCreative = await response.json();
 
       if (onCreativeCreated) {
-        onCreativeCreated({
-          ...creativeData,
-          creativeId,
-        });
+        onCreativeCreated(createdCreative);
       }
 
       addToast("Creative added successfully!", "success");
@@ -151,12 +160,10 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
           overflow: "hidden",
         }}
       >
-        {/* Header */}
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
           <h2 className="text-2xl font-bold">Add Creative</h2>
         </div>
 
-        {/* Scrollable Content */}
         <div className="flex-1 overflow-y-auto px-6 py-4 scrollable-content">
           <form onSubmit={handleSubmit} id="createCreativeForm">
             <div className="mb-4">
@@ -172,8 +179,9 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
                 type="text"
                 value={creativeData.title}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 dark:border-gray-600 border-gray-300 text-black dark:text-gray-200 ${errors.title ? "border-red-500" : ""
-                  }`}
+                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 dark:border-gray-600 border-gray-300 text-black dark:text-gray-200 ${
+                  errors.title ? "border-red-500" : ""
+                }`}
                 placeholder="Enter creative title"
                 maxLength={100}
                 disabled={isSubmitting}
@@ -197,8 +205,9 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
                 type="url"
                 value={creativeData.downloadLink}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 text-black dark:border-gray-600 dark:text-gray-200 ${errors.downloadLink ? "border-red-500" : ""
-                  }`}
+                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 text-black dark:border-gray-600 dark:text-gray-200 ${
+                  errors.downloadLink ? "border-red-500" : ""
+                }`}
                 placeholder="https://example.com/video"
                 disabled={isSubmitting}
                 required
@@ -223,8 +232,9 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
                 type="file"
                 accept="image/*"
                 onChange={handleFileChange}
-                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 dark:border-gray-600 dark:text-gray-200 ${errors.thumbnailFile ? "border-red-500" : ""
-                  }`}
+                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 dark:border-gray-600 dark:text-gray-200 ${
+                  errors.thumbnailFile ? "border-red-500" : ""
+                }`}
                 disabled={isSubmitting}
                 required
               />
@@ -248,8 +258,9 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
                 type="number"
                 value={creativeData.duration}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-gray-100 border-gray-300 text-black border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ${errors.duration ? "border-red-500" : ""
-                  }`}
+                className={`w-full px-3 py-2 bg-gray-100 border-gray-300 text-black border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ${
+                  errors.duration ? "border-red-500" : ""
+                }`}
                 placeholder="Enter duration"
                 min="1"
                 max="300"
@@ -265,7 +276,6 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCr
           </form>
         </div>
 
-        {/* Footer */}
         <div className="px-6 py-4 dark:bg-gray-800 flex justify-end gap-4 border-t border-gray-300 dark:border-gray-600">
           <button
             type="button"

@@ -35,12 +35,12 @@ export default function InventoryPageComponent() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {adBoards.map((adBoard) => (
             <div
-              key={adBoard.id}
+              key={adBoard.adBoardId}
               className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden"
             >
-              {adBoard.imageUrl && (
+              {adBoard.thumbnailUrl && (
                 <Image
-                  src={adBoard.imageUrl}
+                  src={adBoard.thumbnailUrl}
                   alt={adBoard.boardName}
                   width={400}
                   height={192}
@@ -56,15 +56,15 @@ export default function InventoryPageComponent() {
                   Daily Rate: ${adBoard.dailyRate}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Owner Contact: {adBoard.ownerContact}
+                  Owner Contact: {adBoard.ownerId}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Board Type: {adBoard.boardType}
+                  Board Type: {adBoard.thumbnailUrl}
                 </p>
                 <button
                   className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
                   onClick={() => {
-                    setSelectedAdBoardId(adBoard.id);
+                    setSelectedAdBoardId(adBoard.adBoardId);
                     setShowBookingModal(true);
                   }}
                 >
