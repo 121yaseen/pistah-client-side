@@ -78,8 +78,7 @@ export default function InventoryPageComponent() {
       {showBookingModal && (
         <BookInventoryModal
           onClose={() => setShowBookingModal(false)}
-          inventoryId={selectedAdBoardId}
-          creativeId={""}
+          adId={""}
         />
       )}
     </div>
