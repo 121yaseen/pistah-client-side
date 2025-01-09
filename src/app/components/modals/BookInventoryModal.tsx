@@ -102,7 +102,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
     } catch (error) {
       console.error("Error creating bookings:", error);
     }
-    //onClose();
+    onClose();
   };
 
   return (

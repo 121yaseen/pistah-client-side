@@ -8,18 +8,16 @@ import Image from "next/image";
 
 export default function CreativePage() {
   const [creatives, setCreatives] = useState<AdsWithBooking[]>([]);
-
+  const fetchCreativesWithBooking = async () => {
+    try {
+      const response = await fetch("/api/creativesWithBooking");
+      const data = await response.json();
+      setCreatives(data);
+    } catch (error) {
+      console.error("Error fetching creatives with bookings:", error);
+    }
+  };
   useEffect(() => {
-    const fetchCreativesWithBooking = async () => {
-      try {
-        const response = await fetch("/api/creativesWithBooking");
-        const data = await response.json();
-        setCreatives(data);
-      } catch (error) {
-        console.error("Error fetching creatives with bookings:", error);
-      }
-    };
-
     fetchCreativesWithBooking();
   }, []);
 
@@ -27,11 +25,7 @@ export default function CreativePage() {
     <>
       <Header />
       {/* If you still need this for other features, keep it. Otherwise, you can remove it. */}
-      <CreativePageComponent
-        fetchCreatives={() => {
-          /* no-op */
-        }}
-      />
+      <CreativePageComponent fetchCreatives={fetchCreativesWithBooking} />
 
       {/* Container for all cards */}
       <div className="w-full max-w-7xl mx-auto px-4 py-6 space-y-6">
