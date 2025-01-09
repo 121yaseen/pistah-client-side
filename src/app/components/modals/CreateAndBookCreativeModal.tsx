@@ -3,15 +3,18 @@
 import { Ad } from "@/types/interface";
 import React, { useEffect, useState } from "react";
 import CreateCreativeModal from "./CreateCreativeModal";
+import BookInventoryModal from "./BookInventoryModal";
 // import { CreativeData } from "../../../types/creativeTypeFile";
 // import BookInventoryModal from "./BookInventoryModal";
 
 type CreateAndBookCreativeModalProps = {
   onClose: () => void;
+  fetchCreatives: () => void;
 };
 
 const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
   onClose,
+  fetchCreatives,
 }) => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(true);
@@ -32,6 +35,8 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
   }, [showCreateModal, showBookingModal]);
 
   const handleCreativeCreated = (newCreativeData: typeof creativeData) => {
+    console.log(newCreativeData);
+    fetchCreatives();
     setCreativeData(newCreativeData);
     setShowCreateModal(false);
     setShowBookingModal(true);
@@ -48,12 +53,10 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
   return (
     <>
       {showBookingModal && (
-        // <BookInventoryModal
-        //   onClose={handleBookingModalClose}
-        //   inventoryId={""}
-        //   creativeId={creativeData.creativeId}
-        // />
-        <></>
+        <BookInventoryModal
+          onClose={handleBookingModalClose}
+          adId={creativeData.id}
+        />
       )}
       {showCreateModal && (
         <CreateCreativeModal

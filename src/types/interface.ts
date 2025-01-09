@@ -58,3 +58,11 @@ export interface Booking {
   endDate: string;
   status: string;
 }
+
+export interface AdsWithBooking extends Ad {
+  bookings: BookingWithAdBoard[];
+}
+
+export interface BookingWithAdBoard extends Booking {
+  adBoard: AdBoard;
+}

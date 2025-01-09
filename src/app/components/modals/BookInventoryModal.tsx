@@ -1,117 +1,138 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import DateRangePicker from "../shared/DateRangePicker";
 import { Ad, Booking } from "@/types/interface";
 
 type BookInventoryModalProps = {
   onClose: () => void;
-  inventoryId: string;
-  creativeId: string;
+  adId: string;
 };
 
 const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   onClose,
-  inventoryId,
-  creativeId,
+  adId,
 }) => {
-  // Mock data for creatives
-  // const creatives: Ad[] = [
-  //   {
-  //     id: "2000",
-  //     title: "creative1",
-  //     downloadLink: "http://ex.com",
-  //     thumbnailUrl: "",
-  //     createdBy: "", // Add missing properties
-  //     description: "",
-  //     adType: "video",
-  //   },
-  //   {
-  //     id: "2001",
-  //     title: "creative1",
-  //     downloadLink: "http://ex.com",
-  //     thumbnailURL: "",
-  //     createdBy: "", // Add missing properties
-  //     description: "",
-  //     adType: "video",
-  //   },
-  // ];
-  // // Mock data for inventory options
-  // const inventoryOptions = [
-  //   { value: "inv1", label: "Inventory 1" },
-  //   { value: "inv2", label: "Inventory 2" },
-  //   { value: "inv3", label: "Inventory 3" },
-  // ];
+  const [ads, setAds] = useState<Ad[]>([]);
+  const [inventoryOptions, setInventoryOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [selectedAdId, setSelectedAdId] = useState<string>(adId);
+  const [bookingSets, setBookingSets] = useState<Booking[]>([
+    {
+      bookingId: crypto.randomUUID(),
+      adBoardId: "",
+      adId: adId,
+      startDate: Date.now().toString(),
+      endDate: Date.now().toString(),
+      userId: "",
+      status: "pending",
+    },
+  ]);
 
-  // const [bookingSets, setBookingSets] = React.useState<Booking[]>([
-  //   {
-  //     bookingId: crypto.randomUUID(),
-  //     adBoardId: inventoryId,
-  //     adId: creativeId,
-  //     startDate: "null",
-  //     endDate: "null",
-  //     userId: "", // Add missing properties
-  //     status: "pending",
-  //   },
-  // ]);
+  useEffect(() => {
+    const fetchAds = async () => {
+      try {
+        const response = await fetch("/api/creative");
+        const data = await response.json();
+        setAds(data);
+      } catch (error) {
+        console.error("Error fetching creatives:", error);
+      }
+    };
 
-  // const addNewSet = () => {
-  //   setBookingSets([
-  //     ...bookingSets,
-  //     {
-  //       bookingId: crypto.randomUUID(),
-  //       adBoardId: inventoryId,
-  //       adId: creativeId,
-  //       startDate: "", // Changed from null to empty string
-  //       endDate: "", // Changed from null to empty string
-  //       userId: "",
-  //       status: "pending",
-  //     },
-  //   ]);
-  // };
+    const fetchAdBoards = async () => {
+      try {
+        const response = await fetch("/api/adBoard");
+        const data = await response.json();
+        const options = data.map(
+          (board: { adBoardId: string; boardName: string }) => ({
+            value: board.adBoardId,
+            label: board.boardName,
+          })
+        );
+        setInventoryOptions(options);
+      } catch (error) {
+        console.error("Error fetching ad boards:", error);
+      }
+    };
+
+    fetchAds();
+    fetchAdBoards();
+  }, []);
+
+  const addNewSet = () => {
+    setBookingSets((prev) => [
+      ...prev,
+      {
+        bookingId: crypto.randomUUID(),
+        adBoardId: "",
+        adId: selectedAdId,
+        startDate: "",
+        endDate: "",
+        userId: "",
+        status: "pending",
+      },
+    ]);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Add booking logic here
-    onClose();
+    try {
+      const response = await fetch("/api/booking", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(bookingSets),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Failed to create bookings:", errorData);
+        throw new Error(
+          `Failed to create bookings: ${response.status} - ${
+            errorData.message || "Unknown error"
+          }`
+        );
+      }
+
+      const createdBookings = await response.json();
+      console.log("Bookings created successfully:", createdBookings);
+    } catch (error) {
+      console.error("Error creating bookings:", error);
+    }
+    //onClose();
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      {/* <div
-        className="bg-white dark:bg-gray-800 text-gray-200 rounded-lg shadow-lg flex flex-col"
-        style={{
-          width: "50%",
-          height: "80%",
-          overflow: "hidden",
-        }}
-      >
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div className="bg-white dark:bg-gray-800 text-black dark:text-gray-200 rounded-lg shadow-lg flex flex-col w-11/12 md:w-2/3 lg:w-1/2 max-h-[90vh]">
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 dark:text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
-          <h2 className="text-2xl font-bold">Book Inventory</h2>
+          <h2 className="text-2xl font-bold text-white">Book Inventory</h2>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4 scrollable-content">
+        <div className="flex-1 overflow-y-auto px-6 py-4">
           <form onSubmit={handleSubmit} id="bookingForm">
             <div className="mb-4">
-              <label className="block text-sm font-medium mb-1 text-black dark:text-white">
-                Select Creative
+              <label className="block text-sm font-medium mb-1">
+                Select Ad
               </label>
               <select
                 className="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500"
-                value={creativeId}
+                value={selectedAdId}
                 onChange={(e) => {
-                  setBookingSets(
-                    bookingSets.map((s) => ({
-                      ...s,
-                      creativeId: e.target.value,
-                    }))
+                  const newAdId = e.target.value;
+                  setSelectedAdId(newAdId);
+                  setBookingSets((prev) =>
+                    prev.map((s) => ({ ...s, adId: newAdId }))
                   );
                 }}
               >
-                <option value="">Select a creative</option>
-                {creatives.map((creative) => (
+                <option value="">Select an Ad</option>
+                {ads.map((creative) => (
                   <option key={creative.id} value={creative.id}>
-                    {creative.title} ({creative.adType})
+                    {creative.title} ({creative.createdBy})
                   </option>
                 ))}
               </select>
@@ -124,23 +145,24 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                   className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-700"
                 >
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1 text-black dark:text-white">
+                    <label className="block text-sm font-medium mb-1">
                       Select Inventory
                     </label>
                     <select
                       className="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500"
-                      value={set.inventoryId}
+                      value={set.adBoardId}
                       onChange={(e) => {
-                        setBookingSets(
-                          bookingSets.map((s) =>
+                        const newAdBoardId = e.target.value;
+                        setBookingSets((prev) =>
+                          prev.map((s) =>
                             s.bookingId === set.bookingId
-                              ? { ...s, inventory: e.target.value }
+                              ? { ...s, adBoardId: newAdBoardId }
                               : s
                           )
                         );
                       }}
                     >
-                      <option value="">Select an inventory</option>
+                      <option value="">Select an Inventory</option>
                       {inventoryOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -150,36 +172,48 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                   </div>
 
                   <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1 text-black dark:text-white">
+                    <label className="block text-sm font-medium mb-1">
                       Select Booking Dates
                     </label>
                     <DateRangePicker
-                      startDate={set.startDate}
-                      endDate={set.endDate}
+                      startDate={set.startDate ? new Date(set.startDate) : null}
+                      endDate={set.endDate ? new Date(set.endDate) : null}
                       setStartDate={(date) => {
-                        setBookingSets(
-                          bookingSets.map((s) =>
+                        setBookingSets((prev) =>
+                          prev.map((s) =>
                             s.bookingId === set.bookingId
-                              ? { ...s, startDate: date }
+                              ? {
+                                  ...s,
+                                  startDate:
+                                    date?.toISOString().split("T")[0] ?? "",
+                                }
                               : s
                           )
                         );
                       }}
                       setEndDate={(date) => {
-                        setBookingSets(
-                          bookingSets.map((s) =>
+                        setBookingSets((prev) =>
+                          prev.map((s) =>
                             s.bookingId === set.bookingId
-                              ? { ...s, endDate: date }
+                              ? {
+                                  ...s,
+                                  endDate:
+                                    date?.toISOString().split("T")[0] ?? "",
+                                }
                               : s
                           )
                         );
                       }}
                       onTodayClick={() => {
-                        const today = new Date();
-                        setBookingSets(
-                          bookingSets.map((s) =>
+                        const today = new Date().toISOString().split("T")[0];
+                        setBookingSets((prev) =>
+                          prev.map((s) =>
                             s.bookingId === set.bookingId
-                              ? { ...s, startDate: today, endDate: today }
+                              ? {
+                                  ...s,
+                                  startDate: today,
+                                  endDate: today,
+                                }
                               : s
                           )
                         );
@@ -194,7 +228,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
               <button
                 type="button"
                 onClick={addNewSet}
-                className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
               >
                 Add Another Booking
               </button>
@@ -206,7 +240,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 rounded hover:bg-gray-400 bg-gray-600 dark:hover:bg-gray-500"
+            className="px-4 py-2 rounded bg-gray-600 hover:bg-gray-500 text-white"
           >
             Cancel
           </button>
@@ -218,7 +252,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
             Book Now
           </button>
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };

@@ -95,7 +95,14 @@ export default async function handler(
 
       try {
         const createdAd = await createAd(ad, user);
-        return res.status(201).json(createdAd);
+        return res.status(201).json({
+          id: createdAd.adId,
+          title: createdAd.title,
+          downloadLink: createdAd.downloadLink ?? "",
+          thumbnailUrl: createdAd.thumbnailUrl ?? "",
+          duration: createdAd.duration,
+          createdBy: createdAd.createdBy,
+        });
       } catch (error) {
         console.error("Error creating ad:", error);
         return res.status(500).json({ error: "Failed to create ad" });
