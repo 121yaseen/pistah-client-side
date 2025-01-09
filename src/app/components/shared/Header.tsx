@@ -187,7 +187,7 @@ export default function Header({ navLinks = [] }: HeaderProps) {
         {dropdownOpen && (
           <div
             ref={dropdownRef}
-            className="absolute right-0 mt-[105%] w-48 bg-white shadow-lg rounded-md text-gray-800 z-50 dark:bg-gray-800 dark:text-white"
+            className="absolute right-0 mt-[95%] w-48 bg-white shadow-lg rounded-md text-gray-800 z-50 dark:bg-gray-800 dark:text-white"
           >
             <ul className="py-2">
               {/* My Profile */}
