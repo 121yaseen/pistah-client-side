@@ -5,18 +5,23 @@ import React, { useEffect, useState } from "react";
 import CreateAndBookCreativeModal from "./modals/CreateAndBookCreativeModal";
 import { AdsWithBooking } from "@/types/interface";
 import Image from "next/image";
+import { useLoader } from "./shared/LoaderComponent";
 
 const CreativePageComponent: React.FC = () => {
+  const { showLoader, hideLoader } = useLoader();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [creatives, setCreatives] = useState<AdsWithBooking[]>([]);
 
   const fetchCreativesWithBooking = async () => {
     try {
+      showLoader();
       const response = await fetch("/api/creativesWithBooking");
       const data = await response.json();
       setCreatives(data);
     } catch (error) {
       console.error("Error fetching creatives with bookings:", error);
+    } finally {
+      hideLoader();
     }
   };
 
