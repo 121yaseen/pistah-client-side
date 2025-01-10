@@ -62,6 +62,7 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
         <CreateCreativeModal
           onClose={handleCreateModalClose}
           onCreativeCreated={handleCreativeCreated}
+          onEdit={false}
         />
       )}
     </>

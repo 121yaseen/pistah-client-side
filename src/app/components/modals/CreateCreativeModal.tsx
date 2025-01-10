@@ -9,11 +9,13 @@ import { Ad } from "@/types/interface";
 type CreateCreativeModalProps = {
   onClose: () => void;
   onCreativeCreated?: (creativeData: Ad) => void;
+  onEdit: boolean;
 };
 
 const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
   onClose,
   onCreativeCreated,
+  onEdit,
 }) => {
   const { showLoader, hideLoader } = useLoader();
   const { addToast } = useToast();
@@ -161,7 +163,7 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
         }}
       >
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
-          <h2 className="text-2xl font-bold">Add Creative</h2>
+          <h2 className="text-2xl font-bold">{onEdit ? "Edit Creative" : "Add Creative"}</h2>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 scrollable-content">

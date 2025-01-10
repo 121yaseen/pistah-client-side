@@ -3,15 +3,21 @@
 import AddIcon from "@/icons/addIcon";
 import React, { useEffect, useState } from "react";
 import CreateAndBookCreativeModal from "./modals/CreateAndBookCreativeModal";
-import { AdsWithBooking } from "@/types/interface";
+import { AdsWithBooking, BookingWithAdBoard } from "@/types/interface";
 import Image from "next/image";
 import { useLoader } from "./shared/LoaderComponent";
 import PencilIcon from "@/icons/pencilIcon";
 import DeleteIcon from "@/icons/deleteIcon";
 import InventoryIcon from "@/icons/inventoryIcon";
 import Tooltip from "./shared/Tooltip";
+import BookingDetailsModal from "./modals/BookingDetailsModal";
+import BookInventoryModal from "./modals/BookInventoryModal";
+import CreateCreativeModal from "./modals/CreateCreativeModal";
 
 const CreativePageComponent: React.FC = () => {
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showBookingModal, setShowBookingModal] = useState(false);
+  const [selectedBookings, setSelectedBookings] = useState<BookingWithAdBoard[] | null>(null);
   const { showLoader, hideLoader } = useLoader();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [creatives, setCreatives] = useState<AdsWithBooking[]>([]);
@@ -52,35 +58,27 @@ const CreativePageComponent: React.FC = () => {
         </div>
       </div>
 
-      {/* Create Ad Modal */}
-      {isModalOpen && (
-        <CreateAndBookCreativeModal
-          onClose={() => setIsModalOpen(false)}
-          fetchCreatives={fetchCreativesWithBooking}
-        />
-      )}
-
       {/* Container for all cards */}
       <div className="w-full max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {creatives.map((ad) => (
+        {creatives.map((cr) => (
           <div
-            key={ad.id}
-            className="w-full bg-white rounded-lg shadow-md flex flex-col md:flex-row overflow-hidden"
+            key={cr.id}
+            className="w-full bg-white rounded-lg shadow-md flex flex-col md:flex-row overflow-hidden dark:bg-gray-800"
           >
             {/* Thumbnail Section */}
-            {ad.thumbnailUrl && (
+            {cr.thumbnailUrl && (
               <div className="relative h-56 w-full md:w-1/3">
                 <Image
-                  src={ad.thumbnailUrl}
-                  alt={ad.title}
+                  src={cr.thumbnailUrl}
+                  alt={cr.title}
                   fill
                   className="object-cover"
                 />
                 <a
-                  href={ad.downloadLink}
+                  href={cr.downloadLink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute bottom-2 right-2 px-2 py-1 bg-gray-100 border border-blue-500 text-blue-500 text-sm hover:bg-blue-500 hover:text-white transition text-center"
+                  className="absolute bottom-2 right-2 px-2 py-1 bg-gray-100 border border-blue-500 text-blue-500 text-sm hover:bg-blue-500 dark:hover:bg-blue-500 hover:text-white transition text-center dark:bg-gray-800"
                 >
                   Preview
                 </a>
@@ -88,59 +86,47 @@ const CreativePageComponent: React.FC = () => {
             )}
 
             {/* Info Section */}
-            <div className="w-full md:w-2/3 p-4 flex flex-col justify-between">
+            <div className="w-full md:w-2/3 p-4 flex flex-col justify-center">
               <div className="flex justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">{ad.title}</h3>
-                  <p className="text-gray-600 mb-2">
-                    Duration: {ad.duration} seconds
+                  <h3 className="text-xl font-semibold mb-2 text-black dark:text-white">{cr.title}</h3>
+                  <p className="text-gray-600 mb-2 dark:text-gray-300">
+                    Duration: {cr.duration} seconds
                   </p>
 
                   {/* Bookings List */}
-                  {ad.bookings && ad.bookings.length > 0 ? (
+                  {cr.bookings && cr.bookings.length > 0 ? (
                     <div>
-                      <h4 className="font-medium text-gray-700">Bookings:</h4>
-                      <ul className="list-disc list-inside text-sm text-gray-700">
-                        {ad.bookings.map((booking) => (
-                          <li key={booking.bookingId}>
-                            <span className="text-gray-800 font-semibold">
-                              Board :
-                            </span>{" "}
-                            {booking.adBoard.boardName} &nbsp;|&nbsp;
-                            <span className="text-gray-800 font-semibold">
-                              From:
-                            </span>{" "}
-                            {new Date(booking.startDate).toLocaleDateString()}{" "}
-                            &nbsp;|&nbsp;
-                            <span className="text-gray-800 font-semibold">
-                              To:
-                            </span>{" "}
-                            {new Date(booking.endDate).toLocaleDateString()}{" "}
-                            &nbsp;|&nbsp;
-                            <span className="text-gray-800 font-semibold">
-                              Status:
-                            </span>{" "}
-                            {booking.status}
-                          </li>
-                        ))}
-                      </ul>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBookings(cr.bookings)}
+                        className="px-5 py-2 border border-blue-500 text-blue-500 rounded-full text-sm hover:bg-blue-500 hover:text-white transition text-center">
+                        Inventory Details
+                      </button>
                     </div>
                   ) : (
-                    <p className="text-sm text-gray-500 italic mt-5">
-                      No bookings found.
+                    <p className="text-sm text-gray-500 italic mt-5 dark:text-gray-300">
+                      <button
+                        onClick={() => setShowBookingModal(true)}
+                        className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                        Book Inventory
+                      </button>
+                      , to start the campaign.
                     </p>
                   )}
                 </div>
                 <div className="flex flex-col gap-2">
                   <Tooltip text="Edit Creative">
                     <button className="p-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center justify-center"
-                      style={{ width: "40px", height: "40px" }}>
+                      style={{ width: "40px", height: "40px" }}
+                      onClick={() => setShowCreateModal(true)}>
                       <PencilIcon />
                     </button>
                   </Tooltip>
                   <Tooltip text="Edit Inventory">
                     <button className="p-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center justify-center"
-                      style={{ width: "40px", height: "40px" }}>
+                      style={{ width: "40px", height: "40px" }}
+                      onClick={() => setShowBookingModal(true)}>
                       <InventoryIcon />
                     </button>
                   </Tooltip>
@@ -156,6 +142,38 @@ const CreativePageComponent: React.FC = () => {
           </div>
         ))}
       </div>
+
+      {/* Create and BookCreative Modal */}
+      {isModalOpen && (
+        <CreateAndBookCreativeModal
+          onClose={() => setIsModalOpen(false)}
+          fetchCreatives={fetchCreativesWithBooking}
+        />
+      )}
+
+      {/* Add the BookingDetailsModal */}
+      {selectedBookings && (
+        <BookingDetailsModal
+          bookings={selectedBookings}
+          onClose={() => setSelectedBookings(null)}
+        />
+      )}
+
+      {/* BookInventoryModal */}
+      {showBookingModal && (
+        <BookInventoryModal
+          onClose={() => setShowBookingModal(false)}
+          adId={""}
+        />
+      )}
+
+      {/* Edit Creative Modal */}
+      {showCreateModal && (
+        <CreateCreativeModal
+          onClose={() => setShowCreateModal(false)}
+          onEdit={true}
+        />
+      )}
     </div>
   );
 };
