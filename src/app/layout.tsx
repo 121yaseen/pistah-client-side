@@ -3,6 +3,7 @@ import "./globals.css";
 import SessionWrapper from "./components/SessionWrapper";
 import { ToastProvider } from "./context/ToastContext";
 import { LoaderProvider } from "./components/shared/LoaderComponent";
+import Toast from "./components/shared/Toast";
 
 export const metadata: Metadata = {
   title: "Pistah Client Side",
@@ -21,6 +22,7 @@ export default function RootLayout({
           <ToastProvider>
             <SessionWrapper>
               {children}
+              <Toast />
             </SessionWrapper>
           </ToastProvider>
         </LoaderProvider>

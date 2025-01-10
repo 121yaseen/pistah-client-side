@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import DateRangePicker from "../shared/DateRangePicker";
 import { Ad, Booking } from "@/types/interface";
 import { useLoader } from "../shared/LoaderComponent";
+import { useToast } from "@/app/context/ToastContext";
 
 type BookInventoryModalProps = {
   onClose: () => void;
@@ -14,6 +15,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   onClose,
   adId,
 }) => {
+  const { addToast } = useToast();
   const { showLoader, hideLoader } = useLoader();
   const [ads, setAds] = useState<Ad[]>([]);
   const [inventoryOptions, setInventoryOptions] = useState<
@@ -40,6 +42,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         const data = await response.json();
         setAds(data);
       } catch (error) {
+        addToast("Error fetching creatives!", "error");
         console.error("Error fetching creatives:", error);
       } finally {
         hideLoader();
@@ -59,6 +62,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         );
         setInventoryOptions(options);
       } catch (error) {
+        addToast("Error fetching ad boards!", "error");
         console.error("Error fetching ad boards:", error);
       } finally {
         hideLoader();
@@ -98,6 +102,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
 
       if (!response.ok) {
         const errorData = await response.json();
+        addToast("Failed to create bookings!", "error");
         console.error("Failed to create bookings:", errorData);
         throw new Error(
           `Failed to create bookings: ${response.status} - ${errorData.message || "Unknown error"
@@ -105,9 +110,10 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         );
       }
 
-      const createdBookings = await response.json();
-      console.log("Bookings created successfully:", createdBookings);
+      await response.json();
+      addToast("Bookings created successfully!", "success");
     } catch (error) {
+      addToast("Error creating bookings!", "error");
       console.error("Error creating bookings:", error);
     } finally {
       hideLoader();
@@ -117,7 +123,12 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white dark:bg-gray-800 text-black dark:text-gray-200 rounded-lg shadow-lg flex flex-col w-11/12 md:w-2/3 lg:w-1/2 max-h-[90vh]">
+      <div className="bg-white dark:bg-gray-800 text-black dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
+        style={{
+          width: "60%",
+          height: "90%",
+          overflow: "hidden",
+        }}>
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 dark:text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
           <h2 className="text-2xl font-bold text-white">Book Inventory</h2>
         </div>
