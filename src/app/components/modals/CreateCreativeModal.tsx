@@ -132,7 +132,7 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create creative");
+        addToast("Failed to create creative!", "error");
       }
 
       const createdCreative = await response.json();

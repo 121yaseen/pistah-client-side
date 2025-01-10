@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useToast } from "@/app/context/ToastContext";
+import { FaCheck, FaExclamation, FaTimes } from "react-icons/fa";
 
 const Toast: React.FC = () => {
   const { toasts, removeToast } = useToast();
@@ -40,9 +41,9 @@ const Toast: React.FC = () => {
                     : "#2563EB" /* Dark Blue */,
             }}
           >
-            {toast.type === "success" && "✔"}
-            {toast.type === "error" && "✖"}
-            {toast.type === "info" && "!"}
+            {toast.type === "success" && <FaCheck size={16} />}
+            {toast.type === "error" && <FaTimes size={16} />}
+            {toast.type === "info" && <FaExclamation size={16} />}
           </div>
 
           {/* Message */}
