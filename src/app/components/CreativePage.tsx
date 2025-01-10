@@ -17,10 +17,13 @@ import CreateCreativeModal from "./modals/CreateCreativeModal";
 const CreativePageComponent: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
-  const [selectedBookings, setSelectedBookings] = useState<BookingWithAdBoard[] | null>(null);
+  const [selectedBookings, setSelectedBookings] = useState<
+    BookingWithAdBoard[] | null
+  >(null);
   const { showLoader, hideLoader } = useLoader();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [creatives, setCreatives] = useState<AdsWithBooking[]>([]);
+  const [selectedCreative, setSelectedCreative] = useState<string>("");
 
   const fetchCreativesWithBooking = async () => {
     try {
@@ -38,6 +41,11 @@ const CreativePageComponent: React.FC = () => {
   useEffect(() => {
     fetchCreativesWithBooking();
   }, []);
+
+  const OpenInventoryModal = (creativeId: string) => {
+    setSelectedCreative(creativeId);
+    setShowBookingModal(true);
+  };
 
   return (
     <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
@@ -89,7 +97,9 @@ const CreativePageComponent: React.FC = () => {
             <div className="w-full md:w-2/3 p-4 flex flex-col justify-center">
               <div className="flex justify-between">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2 text-black dark:text-white">{cr.title}</h3>
+                  <h3 className="text-xl font-semibold mb-2 text-black dark:text-white">
+                    {cr.title}
+                  </h3>
                   <p className="text-gray-600 mb-2 dark:text-gray-300">
                     Duration: {cr.duration} seconds
                   </p>
@@ -100,15 +110,17 @@ const CreativePageComponent: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setSelectedBookings(cr.bookings)}
-                        className="px-5 py-2 border border-blue-500 text-blue-500 rounded-full text-sm hover:bg-blue-500 hover:text-white transition text-center">
+                        className="px-5 py-2 border border-blue-500 text-blue-500 rounded-full text-sm hover:bg-blue-500 hover:text-white transition text-center"
+                      >
                         Inventory Details
                       </button>
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500 italic mt-5 dark:text-gray-300">
                       <button
-                        onClick={() => setShowBookingModal(true)}
-                        className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                        onClick={() => OpenInventoryModal(cr.id)}
+                        className="text-sm text-blue-500 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                      >
                         Book Inventory
                       </button>
                       , to start the campaign.
@@ -117,22 +129,28 @@ const CreativePageComponent: React.FC = () => {
                 </div>
                 <div className="flex flex-col gap-2">
                   <Tooltip text="Edit Creative">
-                    <button className="p-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center justify-center"
+                    <button
+                      className="p-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center justify-center"
                       style={{ width: "40px", height: "40px" }}
-                      onClick={() => setShowCreateModal(true)}>
+                      onClick={() => setShowCreateModal(true)}
+                    >
                       <PencilIcon />
                     </button>
                   </Tooltip>
                   <Tooltip text="Edit Inventory">
-                    <button className="p-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center justify-center"
+                    <button
+                      className="p-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center justify-center"
                       style={{ width: "40px", height: "40px" }}
-                      onClick={() => setShowBookingModal(true)}>
+                      onClick={() => OpenInventoryModal(cr.id)}
+                    >
                       <InventoryIcon />
                     </button>
                   </Tooltip>
                   <Tooltip text="Delete Campaign">
-                    <button className="p-2 border border-red-500 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition flex items-center justify-center"
-                      style={{ width: "40px", height: "40px" }}>
+                    <button
+                      className="p-2 border border-red-500 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition flex items-center justify-center"
+                      style={{ width: "40px", height: "40px" }}
+                    >
                       <DeleteIcon />
                     </button>
                   </Tooltip>
@@ -163,7 +181,7 @@ const CreativePageComponent: React.FC = () => {
       {showBookingModal && (
         <BookInventoryModal
           onClose={() => setShowBookingModal(false)}
-          adId={""}
+          adId={selectedCreative}
         />
       )}
 
