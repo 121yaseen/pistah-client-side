@@ -39,6 +39,13 @@ const CreativePageComponent: React.FC = () => {
   };
 
   useEffect(() => {
+    document.body.style.overflow = isModalOpen || showCreateModal || showBookingModal || selectedBookings ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isModalOpen, showCreateModal, showBookingModal, selectedBookings]);
+
+  useEffect(() => {
     fetchCreativesWithBooking();
   }, []);
 

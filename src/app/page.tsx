@@ -4,10 +4,8 @@ import { useSession } from "next-auth/react";
 import router from "next/router";
 import { useEffect } from "react";
 import { redirect } from "next/navigation";
-import { useLoader } from "./components/shared/LoaderComponent";
 
 export default function Home() {
-  const { showLoader, hideLoader } = useLoader();
   const { status } = useSession();
   useEffect(() => {
     if (status === "unauthenticated") {
@@ -18,8 +16,13 @@ export default function Home() {
   }, [status]);
 
   if (status === "loading") {
-    showLoader();
+    return (
+      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent border-solid rounded-full animate-spin"></div>
+      </div>
+    );
   }
+
   if (status === "authenticated") {
     redirect("/inventory");
   }

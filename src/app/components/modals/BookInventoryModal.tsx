@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import DateRangePicker from "../shared/DateRangePicker";
 import { Ad, Booking } from "@/types/interface";
+import { useLoader } from "../shared/LoaderComponent";
 
 type BookInventoryModalProps = {
   onClose: () => void;
@@ -13,6 +14,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   onClose,
   adId,
 }) => {
+  const { showLoader, hideLoader } = useLoader();
   const [ads, setAds] = useState<Ad[]>([]);
   const [inventoryOptions, setInventoryOptions] = useState<
     { value: string; label: string }[]
@@ -33,16 +35,20 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   useEffect(() => {
     const fetchAds = async () => {
       try {
+        showLoader();
         const response = await fetch("/api/creative");
         const data = await response.json();
         setAds(data);
       } catch (error) {
         console.error("Error fetching creatives:", error);
+      } finally {
+        hideLoader();
       }
     };
 
     const fetchAdBoards = async () => {
       try {
+        showLoader();
         const response = await fetch("/api/adBoard");
         const data = await response.json();
         const options = data.map(
@@ -54,6 +60,8 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         setInventoryOptions(options);
       } catch (error) {
         console.error("Error fetching ad boards:", error);
+      } finally {
+        hideLoader();
       }
     };
 
@@ -79,6 +87,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      showLoader();
       const response = await fetch("/api/booking", {
         method: "POST",
         headers: {
@@ -91,8 +100,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         const errorData = await response.json();
         console.error("Failed to create bookings:", errorData);
         throw new Error(
-          `Failed to create bookings: ${response.status} - ${
-            errorData.message || "Unknown error"
+          `Failed to create bookings: ${response.status} - ${errorData.message || "Unknown error"
           }`
         );
       }
@@ -101,6 +109,8 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
       console.log("Bookings created successfully:", createdBookings);
     } catch (error) {
       console.error("Error creating bookings:", error);
+    } finally {
+      hideLoader();
     }
     onClose();
   };
@@ -183,10 +193,10 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                           prev.map((s) =>
                             s.bookingId === set.bookingId
                               ? {
-                                  ...s,
-                                  startDate:
-                                    date?.toISOString().split("T")[0] ?? "",
-                                }
+                                ...s,
+                                startDate:
+                                  date?.toISOString().split("T")[0] ?? "",
+                              }
                               : s
                           )
                         );
@@ -196,10 +206,10 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                           prev.map((s) =>
                             s.bookingId === set.bookingId
                               ? {
-                                  ...s,
-                                  endDate:
-                                    date?.toISOString().split("T")[0] ?? "",
-                                }
+                                ...s,
+                                endDate:
+                                  date?.toISOString().split("T")[0] ?? "",
+                              }
                               : s
                           )
                         );
@@ -210,16 +220,16 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                           prev.map((s) =>
                             s.bookingId === set.bookingId
                               ? {
-                                  ...s,
-                                  startDate: today,
-                                  endDate: today,
-                                }
+                                ...s,
+                                startDate: today,
+                                endDate: today,
+                              }
                               : s
                           )
                         );
                       }}
                       showSearchIcon={false}
-                      onSearch={() => {}}
+                      onSearch={() => { }}
                     />
                   </div>
                 </div>
