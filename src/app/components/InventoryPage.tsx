@@ -29,6 +29,13 @@ export default function InventoryPageComponent() {
     fetchAdBoards();
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = showBookingModal ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [showBookingModal]);
+
   return (
     <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
       <div className="container mx-auto p-4">
