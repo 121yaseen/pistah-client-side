@@ -13,7 +13,9 @@ export default async function handler(
     return res.status(400).json({ error: "Missing or invalid userId" });
   }
   if (req.method === "DELETE") {
-    const bookingId = req.query.bookingId as string;
+    const bookingId = Array.isArray(req.query.bookingId)
+      ? req.query.bookingId[0]
+      : (req.query.bookingId as string);
     if (!bookingId) {
       return res.status(400).json({ error: "Missing or invalid bookingId" });
     }

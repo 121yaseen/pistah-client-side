@@ -1,21 +1,24 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useToast } from "@/app/context/ToastContext";
 import { useLoader } from "../shared/LoaderComponent";
 import { Ad } from "@/types/interface";
 // import { CreativeData } from "../../../types/creativeTypeFile";
+import Image from "next/image";
 
 type CreateCreativeModalProps = {
   onClose: () => void;
   onCreativeCreated?: (creativeData: Ad) => void;
   onEdit: boolean;
+  creativeToEdit?: Ad;
 };
 
-const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
+const CreativeModal: React.FC<CreateCreativeModalProps> = ({
   onClose,
   onCreativeCreated,
   onEdit,
+  creativeToEdit,
 }) => {
   const { showLoader, hideLoader } = useLoader();
   const { addToast } = useToast();
@@ -29,6 +32,9 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
     createdBy: "",
     thumbnailUrl: "",
   });
+  const [newThumbnailPreview, setNewThumbnailPreview] = useState<string | null>(
+    null
+  );
 
   const [errors, setErrors] = useState({
     title: false,
@@ -36,6 +42,20 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
     duration: false,
     thumbnailFile: false,
   });
+
+  useEffect(() => {
+    if (creativeToEdit) {
+      setCreativeData({
+        id: creativeToEdit.id,
+        title: creativeToEdit.title,
+        downloadLink: creativeToEdit.downloadLink,
+        duration: creativeToEdit.duration,
+        thumbnailFile: undefined,
+        createdBy: creativeToEdit.createdBy,
+        thumbnailUrl: creativeToEdit.thumbnailUrl,
+      });
+    }
+  }, [creativeToEdit]);
 
   const validateURL = (url: string): boolean => {
     if (!url) return false;
@@ -72,7 +92,7 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
       addToast("File size must be less than 5MB", "error");
       return;
     }
-
+    setNewThumbnailPreview(URL.createObjectURL(file));
     setCreativeData((prev) => ({ ...prev, thumbnailFile: file }));
     setErrors((prev) => ({ ...prev, thumbnailFile: false }));
   };
@@ -105,7 +125,7 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
       title: !creativeData.title.trim(),
       downloadLink: !validateURL(creativeData.downloadLink),
       duration: !validateDuration(creativeData.duration),
-      thumbnailFile: !creativeData.thumbnailFile,
+      thumbnailFile: !creativeData.thumbnailFile && !creativeData.thumbnailUrl,
     };
 
     setErrors(newErrors);
@@ -123,16 +143,27 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
       formData.append("thumbnailFile", creativeData.thumbnailFile);
     }
 
+    let url = "/api/creative";
+    let method = "POST";
+    if (onEdit && creativeData.id) {
+      formData.append("thumbnailUrl", creativeData.thumbnailUrl);
+      url = `/api/creative/${creativeData.id}`;
+      method = "PUT";
+    }
+
     try {
       setIsSubmitting(true);
       showLoader();
-      const response = await fetch("/api/creative", {
-        method: "POST",
+      const response = await fetch(url, {
+        method: method,
         body: formData,
       });
 
       if (!response.ok) {
-        addToast("Failed to create creative!", "error");
+        addToast(
+          onEdit ? "Failed to update creative!" : "Failed to create creative!",
+          "error"
+        );
       }
 
       const createdCreative = await response.json();
@@ -141,11 +172,19 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
         onCreativeCreated(createdCreative);
       }
 
-      addToast("Creative added successfully!", "success");
+      addToast(
+        onEdit
+          ? "Creative updated successfully!"
+          : "Creative added successfully!",
+        "success"
+      );
       onClose();
     } catch (error) {
       console.error("Error creating creative:", error);
-      addToast("Failed to create creative", "error");
+      addToast(
+        onEdit ? "Failed to update creative" : "Failed to create creative",
+        "error"
+      );
     } finally {
       setIsSubmitting(false);
       hideLoader();
@@ -163,7 +202,9 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
         }}
       >
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
-          <h2 className="text-2xl font-bold">{onEdit ? "Edit Creative" : "Add Creative"}</h2>
+          <h2 className="text-2xl font-bold">
+            {onEdit ? "Edit Creative" : "Add Creative"}
+          </h2>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-4 scrollable-content">
@@ -238,12 +279,23 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
                   errors.thumbnailFile ? "border-red-500" : ""
                 }`}
                 disabled={isSubmitting}
-                required
+                required={!creativeData.thumbnailUrl}
               />
               {errors.thumbnailFile && (
                 <p className="text-red-500 text-sm mt-1">
                   Please upload a valid image file (max 5MB)
                 </p>
+              )}
+              {(creativeData.thumbnailUrl || newThumbnailPreview) && (
+                <div className="mt-2">
+                  <Image
+                    src={newThumbnailPreview || creativeData.thumbnailUrl}
+                    alt="Thumbnail"
+                    width={100}
+                    height={100}
+                    style={{ maxWidth: "100px", maxHeight: "100px" }}
+                  />
+                </div>
               )}
             </div>
 
@@ -293,7 +345,7 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed"
             disabled={isSubmitting}
           >
-            Add
+            {onEdit ? "Update" : "Add"}
           </button>
         </div>
       </div>
@@ -301,4 +353,4 @@ const CreateCreativeModal: React.FC<CreateCreativeModalProps> = ({
   );
 };
 
-export default CreateCreativeModal;
+export default CreativeModal;

@@ -2,7 +2,7 @@
 
 import { Ad } from "@/types/interface";
 import React, { useEffect, useState } from "react";
-import CreateCreativeModal from "./CreateCreativeModal";
+import CreativeModal from "./CreateCreativeModal";
 import BookInventoryModal from "./BookInventoryModal";
 // import { CreativeData } from "../../../types/creativeTypeFile";
 // import BookInventoryModal from "./BookInventoryModal";
@@ -10,11 +10,13 @@ import BookInventoryModal from "./BookInventoryModal";
 type CreateAndBookCreativeModalProps = {
   onClose: () => void;
   fetchCreatives: () => void;
+  creativeToEdit?: Ad;
 };
 
 const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
   onClose,
   fetchCreatives,
+  creativeToEdit,
 }) => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(true);
@@ -32,10 +34,12 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
     if (!showCreateModal && !showBookingModal) {
       onClose();
     }
-  }, [showCreateModal, showBookingModal]);
+    if (creativeToEdit) {
+      setCreativeData(creativeToEdit);
+    }
+  }, [showCreateModal, showBookingModal, creativeToEdit]);
 
   const handleCreativeCreated = (newCreativeData: typeof creativeData) => {
-    console.log(newCreativeData);
     fetchCreatives();
     setCreativeData(newCreativeData);
     setShowCreateModal(false);
@@ -60,10 +64,11 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
         />
       )}
       {showCreateModal && (
-        <CreateCreativeModal
+        <CreativeModal
           onClose={handleCreateModalClose}
           onCreativeCreated={handleCreativeCreated}
-          onEdit={false}
+          onEdit={!!creativeToEdit}
+          creativeToEdit={creativeToEdit}
         />
       )}
     </>

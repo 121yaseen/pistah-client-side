@@ -1,4 +1,8 @@
-import { getAdsByUser } from "@/repositories/adRepository";
+import {
+  deleteAdAndRelatedBooking,
+  editAdAsync,
+  getAdsByUser,
+} from "@/repositories/adRepository";
 import { createAdAsync } from "@/repositories/adRepository";
 import { Ad, User } from "@/types/interface";
 import { getAdsWithBookingsByUser } from "@/repositories/adRepository";
@@ -58,4 +62,12 @@ export const fetchAdsWithBookings = async (
       },
     })),
   }));
+};
+
+export const deleteAd = async (adId: string, userId: string) => {
+  return await deleteAdAndRelatedBooking(adId, userId);
+};
+
+export const editAd = async (adId: string, ad: Ad, userId: string) => {
+  return await editAdAsync(adId, ad, userId);
 };

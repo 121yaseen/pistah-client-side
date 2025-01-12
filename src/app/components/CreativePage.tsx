@@ -3,7 +3,7 @@
 import AddIcon from "@/icons/addIcon";
 import React, { useEffect, useState } from "react";
 import CreateAndBookCreativeModal from "./modals/CreateAndBookCreativeModal";
-import { AdsWithBooking, BookingWithAdBoard } from "@/types/interface";
+import { AdsWithBooking, BookingWithAdBoard, Ad } from "@/types/interface";
 import Image from "next/image";
 import { useLoader } from "./shared/LoaderComponent";
 import PencilIcon from "@/icons/pencilIcon";
@@ -12,7 +12,7 @@ import InventoryIcon from "@/icons/inventoryIcon";
 import Tooltip from "./shared/Tooltip";
 import BookingDetailsModal from "./modals/BookingDetailsModal";
 import BookInventoryModal from "./modals/BookInventoryModal";
-import CreateCreativeModal from "./modals/CreateCreativeModal";
+import CreativeModal from "./modals/CreateCreativeModal";
 
 const CreativePageComponent: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -24,6 +24,7 @@ const CreativePageComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [creatives, setCreatives] = useState<AdsWithBooking[]>([]);
   const [selectedCreative, setSelectedCreative] = useState<string>("");
+  const [creativeToEdit, setCreativeToEdit] = useState<Ad | undefined>();
   const [existingBookingsForEdit, setExistingBookingsForEdit] = useState<
     BookingWithAdBoard[]
   >([]);
@@ -66,6 +67,11 @@ const CreativePageComponent: React.FC = () => {
       setExistingBookingsForEdit([]);
     }
     setShowBookingModal(true);
+  };
+
+  const handleEditCreative = (creative: Ad) => {
+    setCreativeToEdit(creative);
+    setShowCreateModal(true);
   };
 
   return (
@@ -153,7 +159,7 @@ const CreativePageComponent: React.FC = () => {
                     <button
                       className="p-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center justify-center"
                       style={{ width: "40px", height: "40px" }}
-                      onClick={() => setShowCreateModal(true)}
+                      onClick={() => handleEditCreative(cr)}
                     >
                       <PencilIcon />
                     </button>
@@ -210,9 +216,11 @@ const CreativePageComponent: React.FC = () => {
 
       {/* Edit Creative Modal */}
       {showCreateModal && (
-        <CreateCreativeModal
+        <CreativeModal
           onClose={() => setShowCreateModal(false)}
+          onCreativeCreated={fetchCreativesWithBooking}
           onEdit={true}
+          creativeToEdit={creativeToEdit}
         />
       )}
     </div>
