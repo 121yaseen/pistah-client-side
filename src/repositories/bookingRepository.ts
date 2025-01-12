@@ -94,3 +94,23 @@ export const updateBookings = async (
     throw error;
   }
 };
+
+export const deleteBooking = async (
+  bookingId: string,
+  userId: string
+): Promise<void> => {
+  try {
+    const booking = await prisma.booking.findUnique({
+      where: { bookingId: bookingId },
+    });
+    if (booking?.userId !== userId) {
+      throw new Error("Unauthorized");
+    }
+    await prisma.booking.delete({
+      where: { bookingId: bookingId },
+    });
+  } catch (error) {
+    console.error("Error deleting booking:", error);
+    throw error;
+  }
+};

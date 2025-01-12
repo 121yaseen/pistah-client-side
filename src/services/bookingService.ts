@@ -3,6 +3,7 @@ import { Booking } from "@/types/interface";
 import {
   createBookings,
   updateBookings,
+  deleteBooking,
 } from "@/repositories/bookingRepository";
 
 export const createNewBookings = async (
@@ -25,6 +26,18 @@ export const updateExistingBookings = async (
     return updatedBookings;
   } catch (error) {
     console.error("Error updating bookings:", error);
+    throw error;
+  }
+};
+
+export const deleteBookingById = async (
+  bookingId: string,
+  userId: string
+): Promise<void> => {
+  try {
+    await deleteBooking(bookingId, userId);
+  } catch (error) {
+    console.error("Error deleting booking:", error);
     throw error;
   }
 };
