@@ -86,6 +86,7 @@ export default function InventoryPageComponent() {
         <BookInventoryModal
           onClose={() => setShowBookingModal(false)}
           adId={""}
+          fetchCreatives={() => {}}
         />
       )}
     </div>

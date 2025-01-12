@@ -61,3 +61,36 @@ export const createBookings = async (
     throw error;
   }
 };
+export const updateBookings = async (
+  bookings: Booking[]
+): Promise<Booking[]> => {
+  try {
+    // Use a transaction to update all or none
+    const updatedBookings = await prisma.$transaction(
+      bookings.map((booking) =>
+        prisma.booking.update({
+          where: { bookingId: booking.bookingId },
+          data: {
+            adBoardId: booking.adBoardId,
+            startDate: new Date(booking.startDate),
+            endDate: new Date(booking.endDate),
+            status: booking.status || "PENDING",
+          },
+        })
+      )
+    );
+
+    return updatedBookings.map((b) => ({
+      bookingId: b.bookingId,
+      userId: b.userId,
+      adId: b.adId,
+      adBoardId: b.adBoardId,
+      startDate: b.startDate.toISOString(),
+      endDate: b.endDate.toISOString(),
+      status: b.status || "PENDING",
+    }));
+  } catch (error) {
+    console.error("Error updating bookings:", error);
+    throw error;
+  }
+};

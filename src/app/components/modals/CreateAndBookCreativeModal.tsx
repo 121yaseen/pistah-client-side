@@ -56,6 +56,7 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
         <BookInventoryModal
           onClose={handleBookingModalClose}
           adId={creativeData.id}
+          fetchCreatives={fetchCreatives}
         />
       )}
       {showCreateModal && (

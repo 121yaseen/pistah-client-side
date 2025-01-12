@@ -34,13 +34,21 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   // Set default date to today's date when component is mounted
   useEffect(() => {
-    const today = new Date();
-    setStartDate(today);
-    setEndDate(today);
-    setSelectedRange({ start: today, end: today });
-  }, []); // Empty dependency array to run once on mount
+    if (!startDate && !endDate) {
+      const today = new Date();
+      setStartDate(today);
+      setEndDate(today);
+      setSelectedRange({ start: today, end: today });
+    }
+  }, [startDate, endDate, setStartDate, setEndDate]);
 
   const handleDateChange = (start: Date, end: Date | null) => {
+    if (start) {
+      start.setUTCHours(0, 0, 0, 0);
+    }
+    if (end) {
+      end.setUTCHours(23, 59, 59, 999);
+    }
     setSelectedRange({ start, end });
     setStartDate(start);
     setEndDate(end);

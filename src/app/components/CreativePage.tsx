@@ -24,6 +24,9 @@ const CreativePageComponent: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [creatives, setCreatives] = useState<AdsWithBooking[]>([]);
   const [selectedCreative, setSelectedCreative] = useState<string>("");
+  const [existingBookingsForEdit, setExistingBookingsForEdit] = useState<
+    BookingWithAdBoard[]
+  >([]);
 
   const fetchCreativesWithBooking = async () => {
     try {
@@ -39,7 +42,10 @@ const CreativePageComponent: React.FC = () => {
   };
 
   useEffect(() => {
-    document.body.style.overflow = isModalOpen || showCreateModal || showBookingModal || selectedBookings ? "hidden" : "";
+    document.body.style.overflow =
+      isModalOpen || showCreateModal || showBookingModal || selectedBookings
+        ? "hidden"
+        : "";
     return () => {
       document.body.style.overflow = "";
     };
@@ -49,8 +55,16 @@ const CreativePageComponent: React.FC = () => {
     fetchCreativesWithBooking();
   }, []);
 
-  const OpenInventoryModal = (creativeId: string) => {
+  const OpenInventoryModal = (
+    creativeId: string,
+    existingBookings?: BookingWithAdBoard[]
+  ) => {
     setSelectedCreative(creativeId);
+    if (existingBookings) {
+      setExistingBookingsForEdit(existingBookings);
+    } else {
+      setExistingBookingsForEdit([]);
+    }
     setShowBookingModal(true);
   };
 
@@ -148,7 +162,7 @@ const CreativePageComponent: React.FC = () => {
                     <button
                       className="p-2 border border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition flex items-center justify-center"
                       style={{ width: "40px", height: "40px" }}
-                      onClick={() => OpenInventoryModal(cr.id)}
+                      onClick={() => OpenInventoryModal(cr.id, cr.bookings)}
                     >
                       <InventoryIcon />
                     </button>
@@ -189,6 +203,8 @@ const CreativePageComponent: React.FC = () => {
         <BookInventoryModal
           onClose={() => setShowBookingModal(false)}
           adId={selectedCreative}
+          existingBookings={existingBookingsForEdit}
+          fetchCreatives={fetchCreativesWithBooking} // <<--- Pass the function
         />
       )}
 
