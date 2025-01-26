@@ -5,17 +5,18 @@ import DateRangePicker from "../shared/DateRangePicker";
 import { Ad, Booking } from "@/types/interface";
 import { useLoader } from "../shared/LoaderComponent";
 import { useToast } from "@/app/context/ToastContext";
+import AddIcon from "@/icons/addIcon";
 
 type BookInventoryModalProps = {
   onClose: () => void;
-  adId: string;
+  creativeId: string;
   existingBookings?: Booking[];
   fetchCreatives: () => void;
 };
 
 const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   onClose,
-  adId,
+  creativeId,
   existingBookings = [],
   fetchCreatives,
 }) => {
@@ -25,7 +26,6 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   const [inventoryOptions, setInventoryOptions] = useState<
     { value: string; label: string }[]
   >([]);
-  const [selectedAdId, setSelectedAdId] = useState<string>(adId);
 
   // If existingBookings length > 0 => we are in edit mode
   const isEditMode = existingBookings.length > 0;
@@ -35,17 +35,15 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   const [bookingSets, setBookingSets] = useState<Booking[]>(
     isEditMode
       ? existingBookings
-      : [
-          {
-            bookingId: crypto.randomUUID(),
-            adBoardId: "",
-            adId: adId,
-            startDate: nowIso,
-            endDate: nowIso,
-            userId: "",
-            status: "pending",
-          },
-        ]
+      : [{
+        bookingId: crypto.randomUUID(),
+        adBoardId: "",
+        adId: creativeId,
+        startDate: nowIso,
+        endDate: nowIso,
+        userId: "",
+        status: "pending",
+      }]
   );
 
   useEffect(() => {
@@ -94,7 +92,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
       {
         bookingId: crypto.randomUUID(),
         adBoardId: "",
-        adId: selectedAdId,
+        adId: creativeId,
         startDate: "",
         endDate: "",
         userId: "",
@@ -128,8 +126,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         );
         console.error("Error (create/update) bookings:", errorData);
         throw new Error(
-          `Failed to (create/update) bookings: ${response.status} - ${
-            errorData.message || "Unknown error"
+          `Failed to (create/update) bookings: ${response.status} - ${errorData.message || "Unknown error"
           }`
         );
       }
@@ -159,59 +156,50 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
       <div
         className="bg-white dark:bg-gray-800 text-black dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
         style={{
-          width: "60%",
+          width: "50%",
           height: "90%",
           overflow: "hidden",
         }}
       >
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 dark:text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
           <h2 className="text-2xl font-bold text-white">
-            {isEditMode ? "Edit Bookings" : "Book Inventory"}
+            {isEditMode ? "Edit Booking" : "Book Inventory"}
           </h2>
         </div>
+        <div className="flex items-center justify-between mb-1 p-1 px-5">
+          {(() => {
+            const creative = ads.find(creative => creative.id === creativeId);
+            return (
+              <h1 className="text-lg font-bold text-gray-500 dark:text-gray-300">
+                {creative ? `${creative.title} (${creative.createdBy})` : ""}
+              </h1>
+            );
+          })()}
+          <div className="flex items-center gap-1">
+            <button
+              type="button"
+              onClick={addNewSet}
+              className="w-6 h-6 border-2 border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition"
+            >
+              <AddIcon />
+            </button>
+            <span className="text-blue-500 text-lg font-semibold">Add Inventory</span>
+          </div>
+        </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-4">
+        <div className="flex-1 overflow-y-auto px-6 py-2">
           <form onSubmit={handleSubmit} id="bookingForm">
-            {/* Ad selection */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium mb-1">
-                Select Ad
-              </label>
-              <select
-                className="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500"
-                value={selectedAdId}
-                onChange={(e) => {
-                  const newAdId = e.target.value;
-                  setSelectedAdId(newAdId);
-                  setBookingSets((prev) =>
-                    prev.map((s) => ({ ...s, adId: newAdId }))
-                  );
-                }}
-                disabled={isEditMode}
-              >
-                <option value="">Select an Ad</option>
-                {ads.map((creative) => (
-                  <option key={creative.id} value={creative.id}>
-                    {creative.title} ({creative.createdBy})
-                  </option>
-                ))}
-              </select>
-            </div>
-
             {/* Booking Sets */}
             <div className="space-y-4">
               {bookingSets.map((set) => (
                 <div
                   key={set.bookingId}
-                  className="p-4 border rounded-lg bg-gray-50 dark:bg-gray-700"
+                  className="p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800"
                 >
                   {/* Inventory */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">
-                      Select Inventory
-                    </label>
+                  <div className="mb-4 px-2">
                     <select
-                      className="w-full p-2 border rounded dark:bg-gray-600 dark:border-gray-500"
+                      className="w-full p-2 px-3 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
                       value={set.adBoardId}
                       onChange={(e) => {
                         const newAdBoardId = e.target.value;
@@ -224,7 +212,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                         );
                       }}
                     >
-                      <option value="">Select an Inventory</option>
+                      <option value="">Select Inventory</option>
                       {inventoryOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -234,69 +222,55 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                   </div>
 
                   {/* Date Range */}
-                  <div className="mb-4">
-                    <label className="block text-sm font-medium mb-1">
-                      Select Booking Dates
+                  <div className="flex items-center gap-2 w-full"> {/* Flex container */}
+                    <label className="text-sm font-semibold flex-shrink-0 ml-6"> {/* Prevent label from shrinking */}
+                      Booking Dates:
                     </label>
-                    <DateRangePicker
-                      startDate={set.startDate ? new Date(set.startDate) : null}
-                      endDate={set.endDate ? new Date(set.endDate) : null}
-                      setStartDate={(date) => {
-                        setBookingSets((prev) =>
-                          prev.map((s) =>
-                            s.bookingId === set.bookingId
-                              ? {
+                    <div className="flex-grow">
+                      <DateRangePicker
+                        startDate={set.startDate ? new Date(set.startDate) : null}
+                        endDate={set.endDate ? new Date(set.endDate) : null}
+                        setStartDate={(date) => {
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? {
                                   ...s,
-                                  startDate:
-                                    date?.toISOString().split("T")[0] ?? "",
+                                  startDate: date?.toISOString().split("T")[0] ?? "",
                                 }
-                              : s
-                          )
-                        );
-                      }}
-                      setEndDate={(date) => {
-                        setBookingSets((prev) =>
-                          prev.map((s) =>
-                            s.bookingId === set.bookingId
-                              ? {
+                                : s
+                            )
+                          );
+                        }}
+                        setEndDate={(date) => {
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? {
                                   ...s,
-                                  endDate:
-                                    date?.toISOString().split("T")[0] ?? "",
+                                  endDate: date?.toISOString().split("T")[0] ?? "",
                                 }
-                              : s
-                          )
-                        );
-                      }}
-                      onTodayClick={() => {
-                        const today = new Date().toISOString().split("T")[0];
-                        setBookingSets((prev) =>
-                          prev.map((s) =>
-                            s.bookingId === set.bookingId
-                              ? {
-                                  ...s,
-                                  startDate: today,
-                                  endDate: today,
-                                }
-                              : s
-                          )
-                        );
-                      }}
-                      showSearchIcon={false}
-                      onSearch={() => {}}
-                    />
+                                : s
+                            )
+                          );
+                        }}
+                        onTodayClick={() => {
+                          const today = new Date().toISOString().split("T")[0];
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? { ...s, startDate: today, endDate: today }
+                                : s
+                            )
+                          );
+                        }}
+                        showSearchIcon={false}
+                        onSearch={() => { }}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
-
-              {!isEditMode && (
-                <button
-                  type="button"
-                  onClick={addNewSet}
-                  className="flex items-center gap-2 px-4 py-2 text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
-                >
-                  Add Another Booking
-                </button>
-              )}
             </div>
           </form>
         </div>
