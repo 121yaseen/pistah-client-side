@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { BiSearch } from "react-icons/bi";
 import CustomCalendar from "./CustomCalendar"; // Assuming you have the CustomCalendar component imported
+import Portal from "./Portal";
 
 interface DateRangePickerProps {
   startDate: Date | null;
@@ -182,9 +183,14 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
       {/* Custom Calendar Popup */}
       {showCalendar && (
+        <Portal>
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 z-[9998]"
+          onClick={() => setShowCalendar(false)} // Close the calendar when clicking outside
+        />
         <div
           ref={calendarRef}
-          className="absolute w-full px-6 z-[9999]"
+          className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] w-[600px] h-[400px] scale-90"
         >
           <CustomCalendar
             startDate={selectedRange.start!}
@@ -192,6 +198,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             onDateChange={handleDateChange}
           />
         </div>
+      </Portal>
       )}
     </div>
   );

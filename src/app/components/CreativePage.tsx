@@ -80,16 +80,16 @@ const CreativePageComponent: React.FC = () => {
         <div className="flex justify-center">
           <div className="w-full max-w-6xl">
             <div className="flex justify-end items-center space-x-2">
-              <span className="text-blue-500 text-2xl">Create Campaign</span>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(true)}
                 className="border-2 border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition"
               >
-                <div className="w-8 h-8 mx-auto my-auto">
+                <div className="w-7 h-7 mx-auto my-auto">
                   <AddIcon />
                 </div>
               </button>
+              <span className="text-blue-500 text-2xl">Create Campaign</span>
             </div>
           </div>
         </div>
@@ -210,7 +210,7 @@ const CreativePageComponent: React.FC = () => {
       {showBookingModal && (
         <BookInventoryModal
           onClose={() => setShowBookingModal(false)}
-          adId={selectedCreative}
+          creativeId={selectedCreative}
           existingBookings={existingBookingsForEdit}
           fetchCreatives={fetchCreativesWithBooking} // <<--- Pass the function
         />

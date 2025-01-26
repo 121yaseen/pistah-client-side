@@ -107,7 +107,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({
   };
 
   return (
-    <div className="p-8 pr-[6%] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg flex gap-12 relative w-120">
+    <div className="p-6 pr-[6%] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg flex gap-12 relative w-120">
       {renderMonth(0)}
       {renderMonth(1)}
 
