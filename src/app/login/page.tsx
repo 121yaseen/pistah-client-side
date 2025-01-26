@@ -41,10 +41,11 @@ const Login = () => {
 
     if (!result?.error) {
       router.push("/inventory");
+      hideLoader();
     } else {
       alert("Login failed. Please check your credentials.");
+      hideLoader();
     }
-    hideLoader();
   };
 
   return (

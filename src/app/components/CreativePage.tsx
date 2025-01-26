@@ -86,7 +86,9 @@ const CreativePageComponent: React.FC = () => {
                 onClick={() => setIsModalOpen(true)}
                 className="border-2 border-blue-500 text-blue-500 rounded-full hover:bg-blue-500 hover:text-white transition"
               >
-                <AddIcon />
+                <div className="w-8 h-8 mx-auto my-auto">
+                  <AddIcon />
+                </div>
               </button>
             </div>
           </div>

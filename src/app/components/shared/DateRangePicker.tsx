@@ -103,13 +103,9 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   };
 
   return (
-    <div
-      className={
-        "relative mx-auto max-w-2xl flex flex-col sm:flex-row justify-center items-center py-8"
-      }
-      style={{ transform: "scale(0.9)", transformOrigin: "center" }}
-    >
-      <div className="flex items-center bg-white dark:bg-gray-800 rounded-full shadow-md border border-gray-300 dark:border-gray-700 overflow-hidden w-full">
+    <div className={"relative max-w-2xl flex flex-col sm:flex-row justify-center items-center"}
+      style={{ transform: "scale(0.85)", transformOrigin: "center" }}>
+      <div className="flex items-center bg-white dark:bg-gray-800 rounded-full shadow-md border border-gray-300 dark:border-gray-700 overflow-hidden w-3/4">
         {/* Today Button */}
         <button
           onClick={(e) => {
@@ -120,7 +116,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             setSelectedRange({ start: today, end: today });
             onTodayClick(); // Call the onTodayClick function
           }}
-          className="h-16 px-8 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 font-semibold text-lg flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition w-full sm:w-auto rounded-l-full"
+          className="h-16 px-8 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 font-semibold text-lg flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition w-full sm:w-auto rounded-l-full"
           style={{
             borderTopRightRadius: "0px",
             borderBottomRightRadius: "0px",
@@ -188,8 +184,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       {showCalendar && (
         <div
           ref={calendarRef}
-          className="absolute w-full max-w-2xl px-6 z-50"
-          style={{ top: "80%" }}
+          className="absolute w-full px-6 z-[9999]"
         >
           <CustomCalendar
             startDate={selectedRange.start!}
