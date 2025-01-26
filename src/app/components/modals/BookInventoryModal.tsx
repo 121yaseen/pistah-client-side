@@ -6,9 +6,11 @@ import { Ad, Booking } from "@/types/interface";
 import { useLoader } from "../shared/LoaderComponent";
 import { useToast } from "@/app/context/ToastContext";
 import AddIcon from "@/icons/addIcon";
+import AddIcon from "@/icons/addIcon";
 
 type BookInventoryModalProps = {
   onClose: () => void;
+  creativeId: string;
   creativeId: string;
   existingBookings?: Booking[];
   fetchCreatives: () => void;
@@ -16,6 +18,7 @@ type BookInventoryModalProps = {
 
 const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   onClose,
+  creativeId,
   creativeId,
   existingBookings = [],
   fetchCreatives,
@@ -35,6 +38,15 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   const [bookingSets, setBookingSets] = useState<Booking[]>(
     isEditMode
       ? existingBookings
+      : [{
+        bookingId: crypto.randomUUID(),
+        adBoardId: "",
+        adId: creativeId,
+        startDate: nowIso,
+        endDate: nowIso,
+        userId: "",
+        status: "pending",
+      }]
       : [{
         bookingId: crypto.randomUUID(),
         adBoardId: "",
@@ -93,6 +105,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         bookingId: crypto.randomUUID(),
         adBoardId: "",
         adId: creativeId,
+        adId: creativeId,
         startDate: "",
         endDate: "",
         userId: "",
@@ -127,6 +140,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         console.error("Error (create/update) bookings:", errorData);
         throw new Error(
           `Failed to (create/update) bookings: ${response.status} - ${errorData.message || "Unknown error"
+          `Failed to (create/update) bookings: ${response.status} - ${errorData.message || "Unknown error"
           }`
         );
       }
@@ -157,6 +171,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         className="bg-white dark:bg-gray-800 text-black dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
         style={{
           width: "50%",
+          width: "50%",
           height: "90%",
           overflow: "hidden",
         }}
@@ -164,13 +179,14 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 dark:text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
           <h2 className="text-2xl font-bold text-white">
             {isEditMode ? "Edit Booking" : "Book Inventory"}
+            {isEditMode ? "Edit Booking" : "Book Inventory"}
           </h2>
         </div>
         <div className="flex items-center justify-between mb-1 p-1 px-5">
           {(() => {
             const creative = ads.find(creative => creative.id === creativeId);
             return (
-              <h1 className="text-lg font-bold text-gray-500 dark:text-gray-300">
+              <h1 className="text-lg font-bold text-gray-500 dark:text-gray-400">
                 {creative ? `${creative.title} (${creative.createdBy})` : ""}
               </h1>
             );
@@ -194,12 +210,12 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
               {bookingSets.map((set) => (
                 <div
                   key={set.bookingId}
-                  className="p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800"
+                  className="p-4 rounded-md border-2 dark:border-none bg-gray-100 dark:bg-gray-700"
                 >
                   {/* Inventory */}
-                  <div className="mb-4 px-2">
+                  <div className="mb-4">
                     <select
-                      className="w-full p-2 px-3 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
+                      className="w-full p-1 border rounded dark:bg-gray-600 dark:border-gray-500"
                       value={set.adBoardId}
                       onChange={(e) => {
                         const newAdBoardId = e.target.value;
@@ -213,6 +229,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                       }}
                     >
                       <option value="">Select Inventory</option>
+                      <option value="">Select Inventory</option>
                       {inventoryOptions.map((option) => (
                         <option key={option.value} value={option.value}>
                           {option.label}
@@ -222,52 +239,52 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                   </div>
 
                   {/* Date Range */}
-                  <div className="flex items-center gap-2 w-full"> {/* Flex container */}
-                    <label className="text-sm font-semibold flex-shrink-0 ml-6"> {/* Prevent label from shrinking */}
-                      Booking Dates:
-                    </label>
-                    <div className="flex-grow">
-                      <DateRangePicker
-                        startDate={set.startDate ? new Date(set.startDate) : null}
-                        endDate={set.endDate ? new Date(set.endDate) : null}
-                        setStartDate={(date) => {
-                          setBookingSets((prev) =>
-                            prev.map((s) =>
-                              s.bookingId === set.bookingId
-                                ? {
-                                  ...s,
-                                  startDate: date?.toISOString().split("T")[0] ?? "",
-                                }
-                                : s
-                            )
-                          );
-                        }}
-                        setEndDate={(date) => {
-                          setBookingSets((prev) =>
-                            prev.map((s) =>
-                              s.bookingId === set.bookingId
-                                ? {
-                                  ...s,
-                                  endDate: date?.toISOString().split("T")[0] ?? "",
-                                }
-                                : s
-                            )
-                          );
-                        }}
-                        onTodayClick={() => {
-                          const today = new Date().toISOString().split("T")[0];
-                          setBookingSets((prev) =>
-                            prev.map((s) =>
-                              s.bookingId === set.bookingId
-                                ? { ...s, startDate: today, endDate: today }
-                                : s
-                            )
-                          );
-                        }}
-                        showSearchIcon={false}
-                        onSearch={() => { }}
-                      />
-                    </div>
+                  <div>
+                  <div className="flex items-center gap-2"> {/* Flex container */}
+  <label className="text-sm font-thin flex-shrink-0"> {/* Prevent label from shrinking */}
+    Select Booking Dates
+  </label>
+  <DateRangePicker
+    startDate={set.startDate ? new Date(set.startDate) : null}
+    endDate={set.endDate ? new Date(set.endDate) : null}
+    setStartDate={(date) => {
+      setBookingSets((prev) =>
+        prev.map((s) =>
+          s.bookingId === set.bookingId
+            ? {
+                ...s,
+                startDate: date?.toISOString().split("T")[0] ?? "",
+              }
+            : s
+        )
+      );
+    }}
+    setEndDate={(date) => {
+      setBookingSets((prev) =>
+        prev.map((s) =>
+          s.bookingId === set.bookingId
+            ? {
+                ...s,
+                endDate: date?.toISOString().split("T")[0] ?? "",
+              }
+            : s
+        )
+      );
+    }}
+    onTodayClick={() => {
+      const today = new Date().toISOString().split("T")[0];
+      setBookingSets((prev) =>
+        prev.map((s) =>
+          s.bookingId === set.bookingId
+            ? { ...s, startDate: today, endDate: today }
+            : s
+        )
+      );
+    }}
+    showSearchIcon={false}
+                      onSearch={() => { }}
+  />
+</div>
                   </div>
                 </div>
               ))}
