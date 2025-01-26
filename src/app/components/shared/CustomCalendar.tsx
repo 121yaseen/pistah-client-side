@@ -43,16 +43,15 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({
         key={date.toDateString()}
         onClick={(e) => !isDisabled && handleDateClick(e, date)}
         onMouseEnter={() => setHoveredDate(date)}
-        className={`w-10 h-10 rounded-full ${
-          isDisabled
+        className={`w-10 h-10 rounded-full ${isDisabled
             ? "text-gray-400 dark:text-gray-600"
             : isSelected
-            ? "bg-blue-500 text-white"
-            : isInRange ||
-              (startDate && hoveredDate && !endDate && date > startDate && date <= hoveredDate)
-            ? "bg-blue-100 text-blue-700"
-            : "hover:text-white text-black dark:text-white hover:bg-blue-500 dark:hover:bg-gray-700"
-        }`}
+              ? "bg-blue-500 text-white"
+              : isInRange ||
+                (startDate && hoveredDate && !endDate && date > startDate && date <= hoveredDate)
+                ? "bg-blue-100 text-blue-700"
+                : "hover:text-white text-black dark:text-white hover:bg-blue-500 dark:hover:bg-gray-700"
+          }`}
         disabled={isDisabled}
       >
         {date.getDate()}
@@ -108,18 +107,20 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({
   };
 
   return (
-    <div className="p-8 pr-[8%] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg flex gap-12 relative w-120">
+    <div className="p-8 pr-[6%] bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg shadow-lg flex gap-12 relative w-120">
       {renderMonth(0)}
       {renderMonth(1)}
 
       {/* Navigation buttons with more spacing */}
       <button
+        type="button"
         className="absolute top-4 left-4 text-gray-500 dark:text-gray-300 text-2xl"
         onClick={() => setCurrentMonth(addMonths(currentMonth, -1))}
       >
         &lt;
       </button>
       <button
+        type="button"
         className="absolute top-4 right-4 text-gray-500 dark:text-gray-300 text-2xl"
         onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}
       >

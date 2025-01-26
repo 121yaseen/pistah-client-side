@@ -4,7 +4,7 @@ import { AdBoard } from "@prisma/client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useLoader } from "./shared/LoaderComponent";
-import BookInventoryModal from "./modals/BookInventoryModal";
+import AddCreativeForInvModal from "./modals/AddCreativeForInvModal";
 
 export default function InventoryPageComponent() {
   const { showLoader, hideLoader } = useLoader();
@@ -83,10 +83,9 @@ export default function InventoryPageComponent() {
         </div>
       </div>
       {showBookingModal && (
-        <BookInventoryModal
+        <AddCreativeForInvModal
           onClose={() => setShowBookingModal(false)}
-          adId={""}
-          fetchCreatives={() => {}}
+          inventoryId={selectedAdBoardId}
         />
       )}
     </div>
