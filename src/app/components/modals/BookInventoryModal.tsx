@@ -162,13 +162,14 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 dark:text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
           <h2 className="text-2xl font-bold text-white">
             {isEditMode ? "Edit Booking" : "Book Inventory"}
+            {isEditMode ? "Edit Booking" : "Book Inventory"}
           </h2>
         </div>
         <div className="flex items-center justify-between mb-1 p-1 px-5">
           {(() => {
             const creative = ads.find(creative => creative.id === creativeId);
             return (
-              <h1 className="text-lg font-bold text-gray-500 dark:text-gray-300">
+              <h1 className="text-lg font-bold text-gray-500 dark:text-gray-400">
                 {creative ? `${creative.title} (${creative.createdById})` : ""}
               </h1>
             );
@@ -192,7 +193,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
               {bookingSets.map((set) => (
                 <div
                   key={set.bookingId}
-                  className="p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800"
+                  className="p-4 rounded-md border-2 dark:border-none bg-gray-100 dark:bg-gray-700"
                 >
                   {/* Flex container for Inventory and Date Range */}
                   <div className="flex flex-row gap-4 items-center">
