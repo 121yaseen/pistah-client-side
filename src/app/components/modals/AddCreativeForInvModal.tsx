@@ -129,7 +129,7 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
           <h2 className="text-2xl font-bold text-white">Book Inventory</h2>
         </div>
         <div className="flex items-center justify-between mb-1 p-1 px-5">
-          <h1 className="text-lg font-bold text-gray-500 dark:text-gray-400">
+          <h1 className="text-lg font-bold text-gray-500 dark:text-gray-300">
             {inventoryOptions.find(inv => inv.value === inventoryId)?.label}
           </h1>
           <div className="flex items-center gap-1">
@@ -150,11 +150,11 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
               {bookingSets.map((set) => (
                 <div
                   key={set.bookingId}
-                  className="p-4 rounded-md border-2 dark:border-none bg-gray-100 dark:bg-gray-700"
+                  className="p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800"
                 >
-                  <div className="mb-4">
+                  <div className="mb-4 px-2">
                     <select
-                      className="w-full p-1 border rounded dark:bg-gray-600 dark:border-gray-500"
+                      className="w-full p-2 px-3 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
                       value={set.adId}
                       onChange={(e) => {
                         const newCreativedId = e.target.value;
@@ -176,56 +176,58 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                     </select>
                   </div>
 
-                  <div>
-                    <label className="text-sm font-thin">
-                      Select Booking Dates
+                  <div className="flex items-center gap-2 w-full">
+                    <label className="text-sm font-semibold flex-shrink-0 ml-6">
+                      Booking Dates:
                     </label>
-                    <DateRangePicker
-                      startDate={set.startDate ? new Date(set.startDate) : null}
-                      endDate={set.endDate ? new Date(set.endDate) : null}
-                      setStartDate={(date) => {
-                        setBookingSets((prev) =>
-                          prev.map((s) =>
-                            s.bookingId === set.bookingId
-                              ? {
-                                ...s,
-                                startDate:
-                                  date?.toISOString().split("T")[0] ?? "",
-                              }
-                              : s
-                          )
-                        );
-                      }}
-                      setEndDate={(date) => {
-                        setBookingSets((prev) =>
-                          prev.map((s) =>
-                            s.bookingId === set.bookingId
-                              ? {
-                                ...s,
-                                endDate:
-                                  date?.toISOString().split("T")[0] ?? "",
-                              }
-                              : s
-                          )
-                        );
-                      }}
-                      onTodayClick={() => {
-                        const today = new Date().toISOString().split("T")[0];
-                        setBookingSets((prev) =>
-                          prev.map((s) =>
-                            s.bookingId === set.bookingId
-                              ? {
-                                ...s,
-                                startDate: today,
-                                endDate: today,
-                              }
-                              : s
-                          )
-                        );
-                      }}
-                      showSearchIcon={false}
-                      onSearch={() => { }}
-                    />
+                    <div className="flex-grow">
+                      <DateRangePicker
+                        startDate={set.startDate ? new Date(set.startDate) : null}
+                        endDate={set.endDate ? new Date(set.endDate) : null}
+                        setStartDate={(date) => {
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? {
+                                  ...s,
+                                  startDate:
+                                    date?.toISOString().split("T")[0] ?? "",
+                                }
+                                : s
+                            )
+                          );
+                        }}
+                        setEndDate={(date) => {
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? {
+                                  ...s,
+                                  endDate:
+                                    date?.toISOString().split("T")[0] ?? "",
+                                }
+                                : s
+                            )
+                          );
+                        }}
+                        onTodayClick={() => {
+                          const today = new Date().toISOString().split("T")[0];
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? {
+                                  ...s,
+                                  startDate: today,
+                                  endDate: today,
+                                }
+                                : s
+                            )
+                          );
+                        }}
+                        showSearchIcon={false}
+                        onSearch={() => { }}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}

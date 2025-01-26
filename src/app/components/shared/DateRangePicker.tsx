@@ -106,7 +106,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   return (
     <div className={"relative max-w-2xl flex flex-col sm:flex-row justify-center items-center"}
       style={{ transform: "scale(0.85)", transformOrigin: "center" }}>
-      <div className="flex items-center bg-white dark:bg-gray-800 rounded-full shadow-md border border-gray-300 dark:border-gray-700 overflow-hidden w-3/4">
+      <div className="flex items-center bg-white dark:bg-gray-700 rounded-full shadow-sm border border-gray-300 dark:border-gray-700 overflow-hidden w-full">
         {/* Today Button */}
         <button
           onClick={(e) => {
@@ -117,7 +117,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             setSelectedRange({ start: today, end: today });
             onTodayClick(); // Call the onTodayClick function
           }}
-          className="h-16 px-8 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-200 font-semibold text-lg flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition w-full sm:w-auto rounded-l-full"
+          className="h-16 px-8 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-200 font-semibold text-lg flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-600 transition w-full sm:w-auto rounded-l-full"
           style={{
             borderTopRightRadius: "0px",
             borderBottomRightRadius: "0px",
@@ -138,10 +138,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
         <div className="border-l border-gray-300 dark:border-gray-600 h-8"></div>
 
         {/* From-To Capsule */}
-        <div className="flex items-center w-full px-6">
+        <div className="flex items-center w-full px-4">
           {/* From Date Picker */}
           <div
-            className="flex items-center gap-4 w-full cursor-pointer"
+            className="flex items-center gap-2 w-full cursor-pointer"
             onClick={handleFromClick}
           >
             <label className="font-semibold text-black dark:text-gray-200 text-base whitespace-nowrap cursor-pointer">
@@ -153,11 +153,11 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           </div>
 
           {/* Vertical Divider */}
-          <div className="border-l border-gray-300 dark:border-gray-600 h-8 mx-4"></div>
+          <div className="border-l border-gray-300 dark:border-gray-600 h-8 mx-2"></div>
 
           {/* To Date Picker */}
           <div
-            className="flex items-center gap-4 w-full cursor-pointer"
+            className="flex items-center gap-2 w-full cursor-pointer"
             onClick={handleToClick}
           >
             <label className="font-semibold text-black dark:text-gray-200 text-base whitespace-nowrap cursor-pointer">
