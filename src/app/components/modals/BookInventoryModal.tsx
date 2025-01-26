@@ -186,7 +186,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
           {(() => {
             const creative = ads.find(creative => creative.id === creativeId);
             return (
-              <h1 className="text-lg font-bold text-gray-500 dark:text-gray-400">
+              <h1 className="text-lg font-bold text-gray-500 dark:text-gray-300">
                 {creative ? `${creative.title} (${creative.createdBy})` : ""}
               </h1>
             );
@@ -210,12 +210,12 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
               {bookingSets.map((set) => (
                 <div
                   key={set.bookingId}
-                  className="p-4 rounded-md border-2 dark:border-none bg-gray-100 dark:bg-gray-700"
+                  className="p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800"
                 >
                   {/* Inventory */}
-                  <div className="mb-4">
+                  <div className="mb-4 px-2">
                     <select
-                      className="w-full p-1 border rounded dark:bg-gray-600 dark:border-gray-500"
+                      className="w-full p-2 px-3 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
                       value={set.adBoardId}
                       onChange={(e) => {
                         const newAdBoardId = e.target.value;
@@ -239,52 +239,52 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                   </div>
 
                   {/* Date Range */}
-                  <div>
-                  <div className="flex items-center gap-2"> {/* Flex container */}
-  <label className="text-sm font-thin flex-shrink-0"> {/* Prevent label from shrinking */}
-    Select Booking Dates
-  </label>
-  <DateRangePicker
-    startDate={set.startDate ? new Date(set.startDate) : null}
-    endDate={set.endDate ? new Date(set.endDate) : null}
-    setStartDate={(date) => {
-      setBookingSets((prev) =>
-        prev.map((s) =>
-          s.bookingId === set.bookingId
-            ? {
-                ...s,
-                startDate: date?.toISOString().split("T")[0] ?? "",
-              }
-            : s
-        )
-      );
-    }}
-    setEndDate={(date) => {
-      setBookingSets((prev) =>
-        prev.map((s) =>
-          s.bookingId === set.bookingId
-            ? {
-                ...s,
-                endDate: date?.toISOString().split("T")[0] ?? "",
-              }
-            : s
-        )
-      );
-    }}
-    onTodayClick={() => {
-      const today = new Date().toISOString().split("T")[0];
-      setBookingSets((prev) =>
-        prev.map((s) =>
-          s.bookingId === set.bookingId
-            ? { ...s, startDate: today, endDate: today }
-            : s
-        )
-      );
-    }}
-    showSearchIcon={false}
-                      onSearch={() => { }}
-  />
-</div>
+                  <div className="flex items-center gap-2 w-full"> {/* Flex container */}
+                    <label className="text-sm font-semibold flex-shrink-0 ml-6"> {/* Prevent label from shrinking */}
+                      Booking Dates:
+                    </label>
+                    <div className="flex-grow">
+                      <DateRangePicker
+                        startDate={set.startDate ? new Date(set.startDate) : null}
+                        endDate={set.endDate ? new Date(set.endDate) : null}
+                        setStartDate={(date) => {
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? {
+                                  ...s,
+                                  startDate: date?.toISOString().split("T")[0] ?? "",
+                                }
+                                : s
+                            )
+                          );
+                        }}
+                        setEndDate={(date) => {
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? {
+                                  ...s,
+                                  endDate: date?.toISOString().split("T")[0] ?? "",
+                                }
+                                : s
+                            )
+                          );
+                        }}
+                        onTodayClick={() => {
+                          const today = new Date().toISOString().split("T")[0];
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? { ...s, startDate: today, endDate: today }
+                                : s
+                            )
+                          );
+                        }}
+                        showSearchIcon={false}
+                        onSearch={() => { }}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
