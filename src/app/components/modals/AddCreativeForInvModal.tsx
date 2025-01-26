@@ -128,7 +128,7 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
           <h2 className="text-2xl font-bold text-white">Book Inventory</h2>
         </div>
         <div className="flex items-center justify-between mb-1 p-1 px-5">
-          <h1 className="text-lg font-bold text-gray-500 dark:text-gray-400">
+          <h1 className="text-lg font-bold text-gray-500 dark:text-gray-300">
             {inventoryOptions.find(inv => inv.value === inventoryId)?.label}
           </h1>
           <div className="flex items-center gap-1">
@@ -153,7 +153,7 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                 >
                   <div className="mb-4 px-2">
                     <select
-                      className="w-full p-1 border rounded dark:bg-gray-600 dark:border-gray-500"
+                      className="w-full p-2 px-3 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
                       value={set.adId}
                       onChange={(e) => {
                         const newCreativedId = e.target.value;
@@ -175,9 +175,9 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                     </select>
                   </div>
 
-                  <div>
-                    <label className="text-sm font-thin">
-                      Select Booking Dates
+                  <div className="flex items-center gap-2 w-full">
+                    <label className="text-sm font-semibold flex-shrink-0 ml-6">
+                      Booking Dates:
                     </label>
                     <div className="flex-grow">
                       <DateRangePicker
