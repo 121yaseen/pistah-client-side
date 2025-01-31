@@ -6,11 +6,9 @@ import { Ad, Booking } from "@/types/interface";
 import { useLoader } from "../shared/LoaderComponent";
 import { useToast } from "@/app/context/ToastContext";
 import AddIcon from "@/icons/addIcon";
-import AddIcon from "@/icons/addIcon";
 
 type BookInventoryModalProps = {
   onClose: () => void;
-  creativeId: string;
   creativeId: string;
   existingBookings?: Booking[];
   fetchCreatives: () => void;
@@ -18,7 +16,6 @@ type BookInventoryModalProps = {
 
 const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   onClose,
-  creativeId,
   creativeId,
   existingBookings = [],
   fetchCreatives,
@@ -38,15 +35,6 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   const [bookingSets, setBookingSets] = useState<Booking[]>(
     isEditMode
       ? existingBookings
-      : [{
-        bookingId: crypto.randomUUID(),
-        adBoardId: "",
-        adId: creativeId,
-        startDate: nowIso,
-        endDate: nowIso,
-        userId: "",
-        status: "pending",
-      }]
       : [{
         bookingId: crypto.randomUUID(),
         adBoardId: "",
@@ -105,7 +93,6 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         bookingId: crypto.randomUUID(),
         adBoardId: "",
         adId: creativeId,
-        adId: creativeId,
         startDate: "",
         endDate: "",
         userId: "",
@@ -140,7 +127,6 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         console.error("Error (create/update) bookings:", errorData);
         throw new Error(
           `Failed to (create/update) bookings: ${response.status} - ${errorData.message || "Unknown error"
-          `Failed to (create/update) bookings: ${response.status} - ${errorData.message || "Unknown error"
           }`
         );
       }
@@ -171,14 +157,12 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         className="bg-white dark:bg-gray-800 text-black dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
         style={{
           width: "50%",
-          width: "50%",
           height: "90%",
           overflow: "hidden",
         }}
       >
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 dark:text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
           <h2 className="text-2xl font-bold text-white">
-            {isEditMode ? "Edit Booking" : "Book Inventory"}
             {isEditMode ? "Edit Booking" : "Book Inventory"}
           </h2>
         </div>
@@ -217,7 +201,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                     {/* Inventory Dropdown */}
                     <div className="flex-1">
                       <select
-                        className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
+                        className="w-full p-2 px-3 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
                         value={set.adBoardId}
                         onChange={(e) => {
                           const newAdBoardId = e.target.value;
