@@ -203,7 +203,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-2">
+        <div className="flex-1 overflow-y-auto px-6 py-2 scrollable-content">
           <form onSubmit={handleSubmit} id="bookingForm">
             {/* Booking Sets */}
             <div className="space-y-4">
@@ -212,38 +212,35 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                   key={set.bookingId}
                   className="p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800"
                 >
-                  {/* Inventory */}
-                  <div className="mb-4 px-2">
-                    <select
-                      className="w-full p-2 px-3 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
-                      value={set.adBoardId}
-                      onChange={(e) => {
-                        const newAdBoardId = e.target.value;
-                        setBookingSets((prev) =>
-                          prev.map((s) =>
-                            s.bookingId === set.bookingId
-                              ? { ...s, adBoardId: newAdBoardId }
-                              : s
-                          )
-                        );
-                      }}
-                    >
-                      <option value="">Select Inventory</option>
-                      <option value="">Select Inventory</option>
-                      {inventoryOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
-                          {option.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                  {/* Flex container for Inventory and Date Range */}
+                  <div className="flex flex-row gap-4 items-center">
+                    {/* Inventory Dropdown */}
+                    <div className="flex-1">
+                      <select
+                        className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
+                        value={set.adBoardId}
+                        onChange={(e) => {
+                          const newAdBoardId = e.target.value;
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? { ...s, adBoardId: newAdBoardId }
+                                : s
+                            )
+                          );
+                        }}
+                      >
+                        <option value="">Select Inventory</option>
+                        {inventoryOptions.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                  {/* Date Range */}
-                  <div className="flex items-center gap-2 w-full"> {/* Flex container */}
-                    <label className="text-sm font-semibold flex-shrink-0 ml-6"> {/* Prevent label from shrinking */}
-                      Booking Dates:
-                    </label>
-                    <div className="flex-grow">
+                    {/* Date Range Picker */}
+                    <div className="flex-1">
                       <DateRangePicker
                         startDate={set.startDate ? new Date(set.startDate) : null}
                         endDate={set.endDate ? new Date(set.endDate) : null}
