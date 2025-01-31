@@ -104,11 +104,11 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   };
 
   return (
-    <div className={"relative max-w-2xl flex flex-col sm:flex-row justify-center items-center"}
+    <div className={"relative max-w-sm flex flex-col sm:flex-row justify-center items-center"}
       style={{ transform: "scale(0.85)", transformOrigin: "center" }}>
       <div className="flex items-center bg-white dark:bg-gray-700 rounded-full shadow-sm border border-gray-300 dark:border-gray-700 overflow-hidden w-full">
         {/* Today Button */}
-        <button
+        {/* <button
           onClick={(e) => {
             e.preventDefault();
             const today = new Date();
@@ -132,22 +132,22 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
           }}
         >
           Today
-        </button>
+        </button> */}
 
         {/* Vertical Divider */}
-        <div className="border-l border-gray-300 dark:border-gray-600 h-8"></div>
+        {/*<div className="border-l border-gray-300 dark:border-gray-600 h-8"></div>*/}
 
         {/* From-To Capsule */}
-        <div className="flex items-center w-full px-4">
+        <div className="h-12 flex items-center w-full px-4">
           {/* From Date Picker */}
           <div
             className="flex items-center gap-2 w-full cursor-pointer"
             onClick={handleFromClick}
           >
-            <label className="font-semibold text-black dark:text-gray-200 text-base whitespace-nowrap cursor-pointer">
+            <label className="font-semibold text-black dark:text-gray-400 text-base whitespace-nowrap cursor-pointer">
               From
             </label>
-            <div className="bg-transparent text-gray-500 dark:text-gray-300 outline-none text-base font-semibold">
+            <div className="bg-transparent text-gray-500 dark:text-gray-200 outline-none text-base font-semibold">
               {formatDate(startDate)}
             </div>
           </div>
@@ -160,10 +160,10 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
             className="flex items-center gap-2 w-full cursor-pointer"
             onClick={handleToClick}
           >
-            <label className="font-semibold text-black dark:text-gray-200 text-base whitespace-nowrap cursor-pointer">
+            <label className="font-semibold text-black dark:text-gray-400 text-base whitespace-nowrap cursor-pointer">
               To
             </label>
-            <div className="bg-transparent text-gray-500 dark:text-gray-300 outline-none text-base font-semibold">
+            <div className="bg-transparent text-gray-500 dark:text-gray-200 outline-none text-base font-semibold">
               {formatDate(endDate)}
             </div>
           </div>

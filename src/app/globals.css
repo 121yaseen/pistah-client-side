@@ -2,16 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  
-}
-
 @media (prefers-color-scheme: dark) {
-  :root {
-    
-  }
 }
 
-body {
-  
+.scrollable-content {
+  /* Add a class to target the scrollable content */
+  overflow-y: auto;
+  max-height: 90%;
+  /* Ensure it doesn't exceed the modal height */
+
+  /* Custom scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 8px;
+    /* Width of the scrollbar */
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(161, 161, 161, 0.95);
+    /* Default theme scrollbar thumb */
+    border-radius: 4px;
+    /* Rounded edges for the thumb */
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: #808080;
+    /* Darker grey when hovered */
+  }
+
+  /* Dark theme adjustments */
+  .dark &::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.95);
+    /* Lighter grey for the dark theme */
+  }
+
+  .dark &::-webkit-scrollbar-thumb:hover {
+    background: #b9b9b9;
+    /* White when hovered in dark theme */
+  }
 }

@@ -144,43 +144,39 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-2">
+        <div className="flex-1 overflow-y-auto px-6 py-2 scrollable-content">
           <form onSubmit={handleSubmit} id="bookingForm">
             <div className="space-y-4">
               {bookingSets.map((set) => (
-                <div
-                  key={set.bookingId}
-                  className="p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800"
-                >
-                  <div className="mb-4 px-2">
-                    <select
-                      className="w-full p-2 px-3 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
-                      value={set.adId}
-                      onChange={(e) => {
-                        const newCreativedId = e.target.value;
-                        setBookingSets((prev) =>
-                          prev.map((s) =>
-                            s.bookingId === set.bookingId
-                              ? { ...s, adId: newCreativedId }
-                              : s
-                          )
-                        );
-                      }}
-                    >
-                      <option value="">Select creative</option>
-                      {ads.map((creative) => (
-                        <option key={creative.id} value={creative.id}>
-                          {creative.title} ({creative.createdBy})
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                <div key={set.bookingId} className="p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
+                  <div className="flex flex-row gap-4 items-center">
+                    {/* Dropdown */}
+                    <div className="flex-1">
+                      <select
+                        className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
+                        value={set.adId}
+                        onChange={(e) => {
+                          const newCreativedId = e.target.value;
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.bookingId === set.bookingId
+                                ? { ...s, adId: newCreativedId }
+                                : s
+                            )
+                          );
+                        }}
+                      >
+                        <option value="">Select Creative</option>
+                        {ads.map((creative) => (
+                          <option key={creative.id} value={creative.id}>
+                            {creative.title} ({creative.createdBy})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                  <div className="flex items-center gap-2 w-full">
-                    <label className="text-sm font-semibold flex-shrink-0 ml-6">
-                      Booking Dates:
-                    </label>
-                    <div className="flex-grow">
+                    {/* Date Range Picker */}
+                    <div className="flex-1">
                       <DateRangePicker
                         startDate={set.startDate ? new Date(set.startDate) : null}
                         endDate={set.endDate ? new Date(set.endDate) : null}
@@ -190,8 +186,7 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                               s.bookingId === set.bookingId
                                 ? {
                                   ...s,
-                                  startDate:
-                                    date?.toISOString().split("T")[0] ?? "",
+                                  startDate: date?.toISOString().split("T")[0] ?? "",
                                 }
                                 : s
                             )
@@ -203,8 +198,7 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                               s.bookingId === set.bookingId
                                 ? {
                                   ...s,
-                                  endDate:
-                                    date?.toISOString().split("T")[0] ?? "",
+                                  endDate: date?.toISOString().split("T")[0] ?? "",
                                 }
                                 : s
                             )
