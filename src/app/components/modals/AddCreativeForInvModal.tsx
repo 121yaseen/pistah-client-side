@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import DateRangePicker from "../shared/DateRangePicker";
-import { Ad, Booking } from "@/types/interface";
+import { Booking, Creative } from "@/types/interface";
 import { useLoader } from "../shared/LoaderComponent";
 import { useToast } from "@/app/context/ToastContext";
 import AddIcon from "@/icons/addIcon";
@@ -15,7 +15,7 @@ type AddCreativeForInvModalProps = {
 const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose, inventoryId }) => {
   const { addToast } = useToast();
   const { showLoader, hideLoader } = useLoader();
-  const [ads, setAds] = useState<Ad[]>([]);
+  const [ads, setAds] = useState<Creative[]>([]);
   const [inventoryOptions, setInventoryOptions] = useState<{ value: string; label: string }[]>([]);
   const nowIso = new Date().toISOString();
   const [bookingSets, setBookingSets] = useState<Booking[]>([
@@ -169,7 +169,7 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                         <option value="">Select Creative</option>
                         {ads.map((creative) => (
                           <option key={creative.id} value={creative.id}>
-                            {creative.title} ({creative.createdBy})
+                            {creative.title} ({creative.createdById})
                           </option>
                         ))}
                       </select>

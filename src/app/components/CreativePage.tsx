@@ -3,7 +3,7 @@
 import AddIcon from "@/icons/addIcon";
 import React, { useEffect, useState } from "react";
 import CreateAndBookCreativeModal from "./modals/CreateAndBookCreativeModal";
-import { AdsWithBooking, BookingWithAdBoard, Ad } from "@/types/interface";
+import { BookingWithAdBoard, Creative, CreativesWithBooking } from "@/types/interface";
 import Image from "next/image";
 import { useLoader } from "./shared/LoaderComponent";
 import PencilIcon from "@/icons/pencilIcon";
@@ -22,9 +22,9 @@ const CreativePageComponent: React.FC = () => {
   >(null);
   const { showLoader, hideLoader } = useLoader();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [creatives, setCreatives] = useState<AdsWithBooking[]>([]);
+  const [creatives, setCreatives] = useState<CreativesWithBooking[]>([]);
   const [selectedCreative, setSelectedCreative] = useState<string>("");
-  const [creativeToEdit, setCreativeToEdit] = useState<Ad | undefined>();
+  const [creativeToEdit, setCreativeToEdit] = useState<Creative | undefined>();
   const [existingBookingsForEdit, setExistingBookingsForEdit] = useState<
     BookingWithAdBoard[]
   >([]);
@@ -69,7 +69,7 @@ const CreativePageComponent: React.FC = () => {
     setShowBookingModal(true);
   };
 
-  const handleEditCreative = (creative: Ad) => {
+  const handleEditCreative = (creative: Creative) => {
     setCreativeToEdit(creative);
     setShowCreateModal(true);
   };

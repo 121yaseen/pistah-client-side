@@ -21,6 +21,19 @@ export interface Ad {
   duration: number;
 }
 
+export interface Creative {
+  id: string;
+  title: string;
+  downloadLink?: string;
+  duration: string;
+  thumbnailUrl?: string;
+  remarks?: string;
+  videoUrl?: string;
+  createdById: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface CustomToken {
   user?: {
     name?: string;
@@ -60,6 +73,10 @@ export interface Booking {
 }
 
 export interface AdsWithBooking extends Ad {
+  bookings: BookingWithAdBoard[];
+}
+
+export interface CreativesWithBooking extends Creative {
   bookings: BookingWithAdBoard[];
 }
 

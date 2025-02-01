@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import DateRangePicker from "../shared/DateRangePicker";
-import { Ad, Booking } from "@/types/interface";
+import { Booking, Creative } from "@/types/interface";
 import { useLoader } from "../shared/LoaderComponent";
 import { useToast } from "@/app/context/ToastContext";
 import AddIcon from "@/icons/addIcon";
@@ -22,7 +22,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
 }) => {
   const { addToast } = useToast();
   const { showLoader, hideLoader } = useLoader();
-  const [ads, setAds] = useState<Ad[]>([]);
+  const [ads, setAds] = useState<Creative[]>([]);
   const [inventoryOptions, setInventoryOptions] = useState<
     { value: string; label: string }[]
   >([]);
@@ -171,7 +171,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
             const creative = ads.find(creative => creative.id === creativeId);
             return (
               <h1 className="text-lg font-bold text-gray-500 dark:text-gray-300">
-                {creative ? `${creative.title} (${creative.createdBy})` : ""}
+                {creative ? `${creative.title} (${creative.createdById})` : ""}
               </h1>
             );
           })()}
