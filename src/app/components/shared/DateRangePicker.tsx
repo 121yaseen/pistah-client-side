@@ -33,22 +33,12 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   const calendarRef = useRef<HTMLDivElement | null>(null);
 
-  // Set default date to today's date when component is mounted
-  useEffect(() => {
-    if (!startDate && !endDate) {
-      const today = new Date();
-      setStartDate(today);
-      setEndDate(today);
-      setSelectedRange({ start: today, end: today });
-    }
-  }, [startDate, endDate, setStartDate, setEndDate]);
-
   const handleDateChange = (start: Date, end: Date | null) => {
     if (start) {
-      start.setUTCHours(0, 0, 0, 0);
+      start.setHours(0, 0, 0, 0);
     }
     if (end) {
-      end.setUTCHours(23, 59, 59, 999);
+      end.setHours(23, 59, 59, 999);
     }
     setSelectedRange({ start, end });
     setStartDate(start);

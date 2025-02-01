@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import DateRangePicker from "../shared/DateRangePicker";
-import { Ad, Booking } from "@/types/interface";
+import { Booking, Creative } from "@/types/interface";
 import { useLoader } from "../shared/LoaderComponent";
 import { useToast } from "@/app/context/ToastContext";
 import AddIcon from "@/icons/addIcon";
@@ -22,15 +22,13 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
 }) => {
   const { addToast } = useToast();
   const { showLoader, hideLoader } = useLoader();
-  const [ads, setAds] = useState<Ad[]>([]);
+  const [ads, setAds] = useState<Creative[]>([]);
   const [inventoryOptions, setInventoryOptions] = useState<
     { value: string; label: string }[]
   >([]);
 
   // If existingBookings length > 0 => we are in edit mode
   const isEditMode = existingBookings.length > 0;
-
-  const nowIso = new Date().toISOString();
 
   const [bookingSets, setBookingSets] = useState<Booking[]>(
     isEditMode
@@ -39,8 +37,8 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
         bookingId: crypto.randomUUID(),
         adBoardId: "",
         adId: creativeId,
-        startDate: nowIso,
-        endDate: nowIso,
+        startDate: "",
+        endDate: "",
         userId: "",
         status: "pending",
       }]
@@ -171,7 +169,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
             const creative = ads.find(creative => creative.id === creativeId);
             return (
               <h1 className="text-lg font-bold text-gray-500 dark:text-gray-300">
-                {creative ? `${creative.title} (${creative.createdBy})` : ""}
+                {creative ? `${creative.title} (${creative.createdById})` : ""}
               </h1>
             );
           })()}
@@ -234,7 +232,9 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                               s.bookingId === set.bookingId
                                 ? {
                                   ...s,
-                                  startDate: date?.toISOString().split("T")[0] ?? "",
+                                  startDate: date ?
+                                    `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+                                    : "",
                                 }
                                 : s
                             )
@@ -246,18 +246,26 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                               s.bookingId === set.bookingId
                                 ? {
                                   ...s,
-                                  endDate: date?.toISOString().split("T")[0] ?? "",
+                                  endDate: date ?
+                                    `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+                                    : "",
                                 }
                                 : s
                             )
                           );
                         }}
                         onTodayClick={() => {
-                          const today = new Date().toISOString().split("T")[0];
+                          const today = new Date();
+                          const todayString = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+
                           setBookingSets((prev) =>
                             prev.map((s) =>
                               s.bookingId === set.bookingId
-                                ? { ...s, startDate: today, endDate: today }
+                                ? {
+                                  ...s,
+                                  startDate: todayString,
+                                  endDate: todayString,
+                                }
                                 : s
                             )
                           );
