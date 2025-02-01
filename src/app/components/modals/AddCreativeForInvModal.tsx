@@ -17,14 +17,13 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
   const { showLoader, hideLoader } = useLoader();
   const [ads, setAds] = useState<Creative[]>([]);
   const [inventoryOptions, setInventoryOptions] = useState<{ value: string; label: string }[]>([]);
-  const nowIso = new Date().toISOString();
   const [bookingSets, setBookingSets] = useState<Booking[]>([
     {
       bookingId: crypto.randomUUID(),
       adBoardId: inventoryId,
       adId: "",
-      startDate: nowIso,
-      endDate: nowIso,
+      startDate: "",
+      endDate: "",
       userId: "",
       status: "pending",
     },
@@ -186,7 +185,9 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                               s.bookingId === set.bookingId
                                 ? {
                                   ...s,
-                                  startDate: date?.toISOString().split("T")[0] ?? "",
+                                  startDate: date ?
+                                    `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+                                    : "",
                                 }
                                 : s
                             )
@@ -198,21 +199,25 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                               s.bookingId === set.bookingId
                                 ? {
                                   ...s,
-                                  endDate: date?.toISOString().split("T")[0] ?? "",
+                                  endDate: date ?
+                                    `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`
+                                    : "",
                                 }
                                 : s
                             )
                           );
                         }}
                         onTodayClick={() => {
-                          const today = new Date().toISOString().split("T")[0];
+                          const today = new Date();
+                          const todayString = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+
                           setBookingSets((prev) =>
                             prev.map((s) =>
                               s.bookingId === set.bookingId
                                 ? {
                                   ...s,
-                                  startDate: today,
-                                  endDate: today,
+                                  startDate: todayString,
+                                  endDate: todayString,
                                 }
                                 : s
                             )
