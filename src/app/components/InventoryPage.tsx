@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useLoader } from "./shared/LoaderComponent";
 import AddCreativeForInvModal from "./modals/AddCreativeForInvModal";
+import ImageCarousel from "./shared/ImageCarousel";
 
 export default function InventoryPageComponent() {
   const { showLoader, hideLoader } = useLoader();
@@ -45,15 +46,9 @@ export default function InventoryPageComponent() {
               key={adBoard.adBoardId}
               className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden"
             >
-              {adBoard.thumbnailUrl && (
-                <Image
-                  src={adBoard.thumbnailUrl}
-                  alt={adBoard.boardName}
-                  width={400}
-                  height={192}
-                  className="w-full h-48 object-cover"
-                />
-              )}
+              <div className="relative w-full" style={{ height: "250px" }}>
+                <ImageCarousel images={[adBoard.thumbnailUrl ?? ""]} />
+              </div>
               <div className="p-4">
                 <h2 className="text-lg font-semibold">{adBoard.boardName}</h2>
                 <p className="text-sm text-gray-600 dark:text-gray-400">

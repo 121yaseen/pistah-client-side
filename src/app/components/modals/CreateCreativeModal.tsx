@@ -50,6 +50,7 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
         videoFile: null,
         createdById: creativeToEdit.createdById,
       });
+      setActiveTab((creativeToEdit.downloadLink || "")?.length > 0 ? "download" : "video");
     }
   }, [onEdit, creativeToEdit]);
 
@@ -197,9 +198,9 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
         activeTab === "download" && !validateURL(creativeData.downloadLink),
       adDuration:
         isNaN(Number(creativeData.adDuration)) || Number(creativeData.adDuration) <= 0,
-      thumbnailFile: !creativeData.thumbnailFile || errors.thumbnailFile,
+      thumbnailFile: (!creativeData.thumbnailFile && creativeData.thumbnailUrl === "") || errors.thumbnailFile,
       videoFile:
-        activeTab === "video" && (!creativeData.videoFile || errors.videoFile),
+        activeTab === "video" && ((!creativeData.videoFile && creativeData.videoUrl === "") || errors.videoFile),
       remarks: creativeData.remarks.trim() === "",
     };
 
@@ -404,7 +405,7 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
                         }}
                         className="absolute -top-2 -right-2 bg-white text-red-500 rounded-full w-6 h-6 flex items-center justify-center text-2xl"
                       >
-                        ×
+                        <span className="relative top-[-2.5px]">×</span>
                       </button>
                     </div>
                   )}
@@ -419,7 +420,7 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
                         }}
                         className="absolute -top-2 -right-2 bg-white text-red-500 rounded-full w-6 h-6 flex items-center justify-center text-2xl"
                       >
-                        ×
+                        <span className="relative top-[-2.5px]">×</span>
                       </button>
                     </div>
                   )}
@@ -524,7 +525,7 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
                     }}
                     className="absolute -top-2 -right-2 bg-white text-red-500 rounded-full w-6 h-6 flex items-center justify-center text-2xl"
                   >
-                    ×
+                    <span className="relative top-[-2.5px]">×</span>
                   </button>
                 </div>
               )}
@@ -544,7 +545,7 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
                     }}
                     className="absolute -top-2 -right-2 bg-white text-red-500 rounded-full w-6 h-6 flex items-center justify-center text-2xl"
                   >
-                    ×
+                    <span className="relative top-[-2.5px]">×</span>
                   </button>
                 </div>
               )}
