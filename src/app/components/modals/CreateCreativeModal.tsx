@@ -17,7 +17,12 @@ type CreateCreativeModalProps = {
   creativeToEdit?: Creative;
 };
 
-const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreativeCreated, onEdit, creativeToEdit }) => {
+const CreativeModal: React.FC<CreateCreativeModalProps> = ({
+  onClose,
+  onCreativeCreated,
+  onEdit,
+  creativeToEdit,
+}) => {
   const [activeTab, setActiveTab] = useState<"download" | "video">("download");
   const { showLoader, hideLoader } = useLoader();
   const { addToast } = useToast();
@@ -50,7 +55,9 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
         videoFile: null,
         createdById: creativeToEdit.createdById,
       });
-      setActiveTab((creativeToEdit.downloadLink || "")?.length > 0 ? "download" : "video");
+      setActiveTab(
+        (creativeToEdit.downloadLink || "")?.length > 0 ? "download" : "video"
+      );
     }
   }, [onEdit, creativeToEdit]);
 
@@ -73,7 +80,10 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
     }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: "thumbnail" | "video") => {
+  const handleFileChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+    type: "thumbnail" | "video"
+  ) => {
     const file = e.target.files?.[0];
     if (!file) {
       setErrors((prev) => ({ ...prev, thumbnailFile: true }));
@@ -124,7 +134,7 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
     const { name, value } = e.target;
     setCreativeData((prev) => ({
       ...prev,
-      [name]: value.trim(),
+      [name]: value,
     }));
     setErrors((prev) => ({
       ...prev,
@@ -141,7 +151,10 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
       ...prevErrors,
       [type]: false,
     }));
-    setErrors((prevErrors) => ({ ...prevErrors, [`${type === "thumbnailUrl" ? "thumbnail" : "video"}File`]: true }));
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [`${type === "thumbnailUrl" ? "thumbnail" : "video"}File`]: true,
+    }));
   };
 
   const uploadVideoToS3 = async (file: File): Promise<string | null> => {
@@ -197,10 +210,15 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
       downloadLink:
         activeTab === "download" && !validateURL(creativeData.downloadLink),
       adDuration:
-        isNaN(Number(creativeData.adDuration)) || Number(creativeData.adDuration) <= 0,
-      thumbnailFile: (!creativeData.thumbnailFile && creativeData.thumbnailUrl === "") || errors.thumbnailFile,
+        isNaN(Number(creativeData.adDuration)) ||
+        Number(creativeData.adDuration) <= 0,
+      thumbnailFile:
+        (!creativeData.thumbnailFile && creativeData.thumbnailUrl === "") ||
+        errors.thumbnailFile,
       videoFile:
-        activeTab === "video" && ((!creativeData.videoFile && creativeData.videoUrl === "") || errors.videoFile),
+        activeTab === "video" &&
+        ((!creativeData.videoFile && creativeData.videoUrl === "") ||
+          errors.videoFile),
       remarks: creativeData.remarks.trim() === "",
     };
 
@@ -251,8 +269,7 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
           onCreativeCreated(createdCreative);
         }
         addToast(
-          `Creative ${onEdit ? "updated" : "added"
-          } successfully!`,
+          `Creative ${onEdit ? "updated" : "added"} successfully!`,
           "success"
         );
         onClose();
@@ -302,8 +319,9 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
                 type="text"
                 value={creativeData.title}
                 onChange={handleChange}
-                className={` w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 dark:border-gray-600 border-gray-300 text-black dark:text-gray-200 ${errors.title ? "border-red-500" : ""
-                  }`}
+                className={` w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 dark:border-gray-600 border-gray-300 text-black dark:text-gray-200 ${
+                  errors.title ? "border-red-500" : ""
+                }`}
                 placeholder="Enter creative name"
                 required
               />
@@ -319,10 +337,11 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
               <div className="flex font-medium text-sm items-center">
                 <button
                   type="button"
-                  className={`py-2 px-4 ${activeTab === "download"
-                    ? "border-b-2 border-blue-500 text-blue-600"
-                    : "text-gray-500"
-                    }`}
+                  className={`py-2 px-4 ${
+                    activeTab === "download"
+                      ? "border-b-2 border-blue-500 text-blue-600"
+                      : "text-gray-500"
+                  }`}
                   onClick={() => setActiveTab("download")}
                 >
                   Video Link{" "}
@@ -333,10 +352,11 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
                 <span className="px-4 text-gray-400">or</span>
                 <button
                   type="button"
-                  className={`py-2 px-4 ${activeTab === "video"
-                    ? "border-b-2 border-blue-500 text-blue-600"
-                    : "text-gray-500"
-                    }`}
+                  className={`py-2 px-4 ${
+                    activeTab === "video"
+                      ? "border-b-2 border-blue-500 text-blue-600"
+                      : "text-gray-500"
+                  }`}
                   onClick={() => setActiveTab("video")}
                 >
                   Video Upload{" "}
@@ -355,8 +375,9 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
                     type="url"
                     value={creativeData.downloadLink || ""}
                     onChange={handleChange}
-                    className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 text-black dark:border-gray-600 dark:text-gray-200 ${errors.downloadLink ? "border-red-500" : ""
-                      }`}
+                    className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 text-black dark:border-gray-600 dark:text-gray-200 ${
+                      errors.downloadLink ? "border-red-500" : ""
+                    }`}
                     placeholder="Link to download video"
                     required={activeTab === "download"}
                   />
@@ -441,8 +462,9 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
                 type="number"
                 value={creativeData.adDuration}
                 onChange={handleChange}
-                className={`w-full px-3 py-2 bg-gray-100 border-gray-300 text-black border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ${errors.adDuration ? "border-red-500" : ""
-                  }`}
+                className={`w-full px-3 py-2 bg-gray-100 border-gray-300 text-black border rounded dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200 ${
+                  errors.adDuration ? "border-red-500" : ""
+                }`}
                 placeholder="Enter duration in seconds"
                 required
               />
@@ -466,8 +488,9 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
                 value={creativeData.remarks}
                 onChange={handleChange}
                 rows={5}
-                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 text-black dark:border-gray-600 dark:text-gray-200 ${errors.remarks ? "border-red-500" : ""
-                  }`}
+                className={`w-full px-3 py-2 border rounded dark:bg-gray-700 bg-gray-100 border-gray-300 text-black dark:border-gray-600 dark:text-gray-200 ${
+                  errors.remarks ? "border-red-500" : ""
+                }`}
                 placeholder="Enter more details"
               />
               {errors.remarks && (

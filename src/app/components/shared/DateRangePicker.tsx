@@ -18,7 +18,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   endDate,
   setStartDate,
   setEndDate,
-  onTodayClick,
+  //onTodayClick,
   showSearchIcon = true,
   onSearch,
 }) => {
@@ -41,8 +41,8 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       end.setHours(23, 59, 59, 999);
     }
     setSelectedRange({ start, end });
-    setStartDate(start);
-    setEndDate(end);
+    setStartDate(new Date(start.getTime() + 24 * 60 * 60 * 1000));
+    if (end) setEndDate(new Date(end.getTime() + 24 * 60 * 60 * 1000));
 
     // Close the calendar only if both dates are selected or no date is selected
     if ((start && end) || (!start && !end)) {
@@ -52,7 +52,12 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
 
   const handleFromClick = () => {
     setShowCalendar(true);
-    setSelectedRange({ start: startDate, end: endDate });
+    setSelectedRange({
+      start: new Date(
+        (startDate ?? new Date()).getTime() + 24 * 60 * 60 * 1000
+      ),
+      end: endDate,
+    });
   };
 
   const handleToClick = () => {
@@ -94,8 +99,12 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
   };
 
   return (
-    <div className={"relative max-w-sm flex flex-col sm:flex-row justify-center items-center"}
-      style={{ transform: "scale(0.85)", transformOrigin: "center" }}>
+    <div
+      className={
+        "relative max-w-sm flex flex-col sm:flex-row justify-center items-center"
+      }
+      style={{ transform: "scale(0.85)", transformOrigin: "center" }}
+    >
       <div className="flex items-center bg-white dark:bg-gray-700 rounded-full shadow-sm border border-gray-300 dark:border-gray-700 overflow-hidden w-full">
         {/* Today Button */}
         {/* <button
@@ -174,9 +183,14 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({
       {/* Custom Calendar Popup */}
       {showCalendar && (
         <Portal>
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-[9998]" />
-          <div ref={calendarRef}
-            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] w-[600px] h-[400px] scale-90">
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-[9998]"
+            onClick={() => setShowCalendar(false)}
+          />
+          <div
+            ref={calendarRef}
+            className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] w-[600px] h-[400px] scale-90"
+          >
             <CustomCalendar
               startDate={selectedRange.start!}
               endDate={selectedRange.end}

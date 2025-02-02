@@ -88,6 +88,16 @@ export default async function handler(
   if (req.method === "GET") {
     try {
       const adBoards = await getAdBoards();
+      adBoards.forEach((adBoard) => {
+        if (typeof adBoard.imageUrl === "string") {
+          try {
+            adBoard.imageUrl = JSON.parse(adBoard.imageUrl);
+          } catch (error) {
+            console.error("Error parsing imageUrl:", error);
+            adBoard.imageUrl = "[]";
+          }
+        }
+      });
       return res.status(200).json(adBoards);
     } catch (error) {
       console.error("Error fetching ad boards:", error);

@@ -2,63 +2,61 @@ import {
   deleteAdAndRelatedBooking,
   editAdAsync,
   getAdsByUser,
+  createAdAsync,
+  getAdsWithBookingsByUser,
 } from "@/repositories/adRepository";
-import { createAdAsync } from "@/repositories/adRepository";
 import { Ad, User } from "@/types/interface";
-import { getAdsWithBookingsByUser } from "@/repositories/adRepository";
-import { AdsWithBooking } from "@/types/interface";
 
-export const fetchFilteredAds = async (
-  createdUserId: string
-): Promise<Ad[]> => {
+export const fetchFilteredAds = async (createdUserId: string) => {
   const ads = await getAdsByUser(createdUserId);
-  return ads.map((ad) => ({
-    id: ad.adId,
-    createdBy: ad.createdBy,
-    title: ad.title,
-    downloadLink: ad.downloadLink || "",
-    thumbnailUrl: ad.thumbnailUrl || "",
-    thumbnailFile: undefined,
-    duration: ad.duration,
-  }));
+  return ads;
 };
 
 export const createAd = async (ad: Ad, user: User) => {
   return await createAdAsync(ad, user);
 };
 
-export const fetchAdsWithBookings = async (
-  createdUserId: string
-): Promise<AdsWithBooking[]> => {
+export const fetchAdsWithBookings = async (createdUserId: string) => {
   const ads = await getAdsWithBookingsByUser(createdUserId);
   return ads.map((ad) => ({
-    id: ad.adId,
-    createdBy: ad.createdBy,
+    id: ad.id,
+    createdById: ad.createdById,
     title: ad.title,
     downloadLink: ad.downloadLink || "",
     thumbnailUrl: ad.thumbnailUrl || "",
     thumbnailFile: undefined,
-    duration: ad.duration,
+    adBoardId: ad.adBoardId,
+    adDuration: ad.adDuration,
+    remarks: ad.remarks,
+    videoUrl: ad.videoUrl,
+    createdAt: ad.createdAt.toISOString(),
+    updatedAt: ad.updatedAt.toISOString(),
     bookings: ad.bookings.map((booking) => ({
-      bookingId: booking.bookingId,
+      id: booking.id,
       userId: booking.userId,
       adId: booking.adId,
       adBoardId: booking.adBoardId,
       startDate: booking.startDate.toISOString(),
       endDate: booking.endDate.toISOString(),
-      status: booking.status || "PENDING",
+      status: booking.status as "PENDING" | "CONFIRMED" | "CANCELLED",
+      createdAt: booking.createdAt.toISOString(),
+      updatedAt: booking.updatedAt.toISOString(),
       adBoard: {
-        adBoardId: booking.adBoard.adBoardId,
+        id: booking.adBoard.id,
         ownerId: booking.adBoard.ownerId,
+        boardName: booking.adBoard.boardName,
         location: booking.adBoard.location,
         description: booking.adBoard.description || "",
-        defaultCapacity: booking.adBoard.defaultCapacity,
-        boardName: booking.adBoard.boardName,
-        boardLength: booking.adBoard.boardLength || 0,
-        boardWidth: booking.adBoard.boardWidth || 0,
-        dailyRate: booking.adBoard.dailyRate || 0,
-        operationalHours: booking.adBoard.operationalHours || "",
-        thumbnailUrl: booking.adBoard.thumbnailUrl || "",
+        dimensions: booking.adBoard.dimensions,
+        boardType: booking.adBoard.boardType,
+        isAvailable: booking.adBoard.isAvailable,
+        dailyRate: booking.adBoard.dailyRate,
+        operationalHours: booking.adBoard.operationalHours,
+        ownerContact: booking.adBoard.ownerContact,
+        lastMaintenanceDate: booking.adBoard.lastMaintenanceDate.toISOString(),
+        imageUrl: JSON.parse(booking.adBoard.imageUrl),
+        createdAt: booking.adBoard.createdAt.toISOString(),
+        updatedAt: booking.adBoard.updatedAt.toISOString(),
       },
     })),
   }));

@@ -12,24 +12,28 @@ type AddCreativeForInvModalProps = {
   inventoryId: string;
 };
 
-const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose, inventoryId }) => {
+const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({
+  onClose,
+  inventoryId,
+}) => {
   const { addToast } = useToast();
   const { showLoader, hideLoader } = useLoader();
   const [ads, setAds] = useState<Creative[]>([]);
-  const [inventoryOptions, setInventoryOptions] = useState<{ value: string; label: string }[]>([]);
-  const [bookingSets, setBookingSets] = useState<Booking[]>([
+  const [inventoryOptions, setInventoryOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+  const [bookingSets, setBookingSets] = useState<Partial<Booking>[]>([
     {
-      bookingId: crypto.randomUUID(),
+      id: crypto.randomUUID(),
       adBoardId: inventoryId,
-      adId: "",
-      startDate: "",
-      endDate: "",
-      userId: "",
-      status: "pending",
+      status: "PENDING",
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
     },
   ]);
-  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
-  const [deleteIndex, setDeleteIndex] = useState<string | null>(null);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+  const [deleteIndex, setDeleteIndex] = useState<number | null>(null);
   const [errors, setErrors] = useState<string[]>([]);
 
   useEffect(() => {
@@ -75,13 +79,15 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
     setBookingSets((prev) => [
       ...prev,
       {
-        bookingId: crypto.randomUUID(),
+        id: crypto.randomUUID(),
         adBoardId: inventoryId,
         adId: "",
         startDate: "",
         endDate: "",
         userId: "",
-        status: "pending",
+        status: "PENDING",
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
       },
     ]);
   };
@@ -93,7 +99,7 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
     let hasErrors = false;
     bookingSets.forEach((set) => {
       if (set.adId === "" || set.startDate === "" || set.endDate === "") {
-        newErrors.push(set.bookingId);
+        newErrors.push(set.id ?? "");
         hasErrors = true;
       }
     });
@@ -118,7 +124,8 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
         addToast("Failed to create bookings!", "error");
         console.error("Failed to create bookings:", errorData);
         throw new Error(
-          `Failed to create bookings: ${response.status} - ${errorData.message || "Unknown error"
+          `Failed to create bookings: ${response.status} - ${
+            errorData.message || "Unknown error"
           }`
         );
       }
@@ -133,15 +140,17 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
     }
     onClose();
   };
-
-  const openDeleteConfirmModal = (index: string) => {
+  const openDeleteConfirmModal = (index: number) => {
     setDeleteIndex(index);
     setIsDeleteConfirmationOpen(true);
   };
 
   const handleDeleteConfirmation = async (confirmed: boolean) => {
     if (confirmed && deleteIndex !== null) {
-      setBookingSets((prev) => prev.filter((set) => set.bookingId !== deleteIndex));
+      setBookingSets((prev) => {
+        const updatedSets = prev.filter((_, index) => index !== deleteIndex);
+        return updatedSets;
+      });
     }
     setIsDeleteConfirmationOpen(false);
     setDeleteIndex(null);
@@ -149,18 +158,20 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-      <div className="bg-white dark:bg-gray-800 text-black dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
+      <div
+        className="bg-white dark:bg-gray-800 text-black dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
         style={{
           width: "50%",
           height: "90%",
           overflow: "hidden",
-        }}>
+        }}
+      >
         <div className="px-6 py-4 bg-[#001464] dark:bg-gray-800 dark:text-gray-200 flex justify-between items-center border-b border-gray-300 dark:border-gray-600">
           <h2 className="text-2xl font-bold text-white">Book Inventory</h2>
         </div>
         <div className="flex items-center justify-between mb-1 p-1 px-5">
           <h1 className="text-lg font-bold text-gray-500 dark:text-gray-300">
-            {inventoryOptions.find(inv => inv.value === inventoryId)?.label}
+            {inventoryOptions.find((inv) => inv.value === inventoryId)?.label}
           </h1>
           <div className="flex items-center gap-1">
             <button
@@ -170,154 +181,140 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
             >
               <AddIcon />
             </button>
-            <span className="text-blue-500 text-lg font-semibold">Add Creative</span>
+            <span className="text-blue-500 text-lg font-semibold">
+              Add Creative
+            </span>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-2 scrollable-content">
           <form onSubmit={handleSubmit} id="bookingForm">
             <div className="space-y-4">
-              {bookingSets.length === 0 ? ( // Check if bookingSets is empty
-                <div className="font-bold p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800 text-center text-gray-500 dark:text-gray-400">
-                  Add now, to start the journey!
-                </div>
-              ) : (
-                bookingSets.map((set) => (
-                  <div
-                    key={set.bookingId}
-                    className={`group p-4 rounded-md border relative transition-colors bg-gray-100 dark:bg-gray-800 
-                      hover:bg-gray-200 dark:hover:bg-gray-500 dark:hover:border-gray-500 
-                      ${errors.findIndex(e => e === set.bookingId) > -1 ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
+              {bookingSets.map((set, index) => (
+                <div
+                  key={set.id}
+                  className={`group p-4 rounded-md border relative transition-colors bg-gray-100 dark:bg-gray-800 
+                  hover:bg-gray-200 dark:hover:bg-gray-500 dark:hover:border-gray-500 
+                  ${
+                    errors.findIndex((e) => e === set.id) > -1
+                      ? "border-red-500"
+                      : "border-gray-300 dark:border-gray-600"
+                  }`}
+                >
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    onClick={() => openDeleteConfirmModal(index)}
+                    className="p-2 rounded-full flex items-center justify-center absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                    style={{
+                      width: "15px",
+                      height: "15px",
+                      backgroundColor: "rgba(0, 0, 0, 0.5)", // Grey circle background with transparency
+                      border: "none", // Remove the border
+                      color: "white", // Faded white color for the cross
+                      display: "flex", // Ensure flexbox is applied
+                      alignItems: "center", // Vertically center the cross
+                      justifyContent: "center", // Horizontally center the cross
+                      fontSize: "15px", // Adjust font size to fit the circle
+                      lineHeight: "1", // Remove extra line height
+                    }}
                   >
-                    {/* Delete Button */}
-                    <button
-                      type="button"
-                      onClick={() => openDeleteConfirmModal(set.bookingId)}
-                      className="p-2 rounded-full flex items-center justify-center absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      style={{
-                        width: "15px",
-                        height: "15px",
-                        backgroundColor: "rgba(0, 0, 0, 0.5)", // Grey circle background with transparency
-                        border: "none", // Remove the border
-                        color: "white", // Faded white color for the cross
-                        display: "flex", // Ensure flexbox is applied
-                        alignItems: "center", // Vertically center the cross
-                        justifyContent: "center", // Horizontally center the cross
-                        fontSize: "15px", // Adjust font size to fit the circle
-                        lineHeight: "1", // Remove extra line height
-                      }}
-                    >
-                      × {/* Use the multiplication symbol for a better-looking cross */}
-                    </button>
+                    ×{" "}
+                    {/* Use the multiplication symbol for a better-looking cross */}
+                  </button>
 
-                    {/* Flex container for Dropdown and Date Range Picker */}
-                    <div className="flex flex-row gap-4 items-center">
-                      {/* Dropdown */}
-                      <div className="flex-1">
-                        <select
-                          className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
-                          value={set.adId}
-                          onChange={(e) => {
-                            const newCreativedId = e.target.value;
-                            setBookingSets((prev) =>
-                              prev.map((s) =>
-                                s.bookingId === set.bookingId
-                                  ? { ...s, adId: newCreativedId }
-                                  : s
-                              )
-                            );
-                          }}
-                        >
-                          <option value="">Select Creative</option>
-                          {ads.map((creative) => (
-                            <option className="cursor-pointer" key={creative.id} value={creative.id}>
-                              {creative.title} ({creative.createdById})
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      {/* Date Range Picker */}
-                      <div className="flex-1">
-                        <DateRangePicker
-                          startDate={set.startDate ? new Date(set.startDate) : null}
-                          endDate={set.endDate ? new Date(set.endDate) : null}
-                          setStartDate={(date) => {
-                            setBookingSets((prev) =>
-                              prev.map((s) =>
-                                s.bookingId === set.bookingId
-                                  ? {
-                                    ...s,
-                                    startDate: date
-                                      ? `${date.getFullYear()}-${(date.getMonth() + 1)
-                                        .toString()
-                                        .padStart(2, "0")}-${date
-                                          .getDate()
-                                          .toString()
-                                          .padStart(2, "0")}`
-                                      : "",
-                                  }
-                                  : s
-                              )
-                            );
-                          }}
-                          setEndDate={(date) => {
-                            setBookingSets((prev) =>
-                              prev.map((s) =>
-                                s.bookingId === set.bookingId
-                                  ? {
-                                    ...s,
-                                    endDate: date
-                                      ? `${date.getFullYear()}-${(date.getMonth() + 1)
-                                        .toString()
-                                        .padStart(2, "0")}-${date
-                                          .getDate()
-                                          .toString()
-                                          .padStart(2, "0")}`
-                                      : "",
-                                  }
-                                  : s
-                              )
-                            );
-                          }}
-                          onTodayClick={() => {
-                            const today = new Date();
-                            const todayString = `${today.getFullYear()}-${(
-                              today.getMonth() + 1
+                  {/* Flex container for Dropdown and Date Range Picker */}
+                  <div className="flex flex-row gap-4 items-center">
+                    {/* Dropdown */}
+                    <div className="flex-1">
+                      <select
+                        className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
+                        value={set.adId}
+                        onChange={(e) => {
+                          const newCreativedId = e.target.value;
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.id === set.id
+                                ? { ...s, adId: newCreativedId }
+                                : s
                             )
-                              .toString()
-                              .padStart(2, "0")}-${today
-                                .getDate()
-                                .toString()
-                                .padStart(2, "0")}`;
-
-                            setBookingSets((prev) =>
-                              prev.map((s) =>
-                                s.bookingId === set.bookingId
-                                  ? {
-                                    ...s,
-                                    startDate: todayString,
-                                    endDate: todayString,
-                                  }
-                                  : s
-                              )
-                            );
-                          }}
-                          showSearchIcon={false}
-                          onSearch={() => { }}
-                        />
-                      </div>
+                          );
+                        }}
+                      >
+                        <option value="">Select Creative</option>
+                        {ads.map((creative) => (
+                          <option
+                            className="cursor-pointer"
+                            key={creative.id}
+                            value={creative.id}
+                          >
+                            {creative.title} ({creative.createdById})
+                          </option>
+                        ))}
+                      </select>
                     </div>
 
-                    {/* Error messages */}
-                    {(errors.findIndex(e => e === set.bookingId) > -1) && (
-                      <div className="text-red-500 text-sm">
-                        All fields are required.
-                      </div>
-                    )}
+                    {/* Date Range Picker */}
+                    <div className="flex-1">
+                      <DateRangePicker
+                        startDate={
+                          set.startDate ? new Date(set.startDate) : null
+                        }
+                        endDate={set.endDate ? new Date(set.endDate) : null}
+                        setStartDate={(date) => {
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.id === set.id
+                                ? {
+                                    ...s,
+                                    startDate:
+                                      date?.toISOString().split("T")[0] ?? "",
+                                  }
+                                : s
+                            )
+                          );
+                        }}
+                        setEndDate={(date) => {
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.id === set.id
+                                ? {
+                                    ...s,
+                                    endDate:
+                                      date?.toISOString().split("T")[0] ?? "",
+                                  }
+                                : s
+                            )
+                          );
+                        }}
+                        onTodayClick={() => {
+                          const today = new Date().toISOString().split("T")[0];
+                          setBookingSets((prev) =>
+                            prev.map((s) =>
+                              s.id === set.id
+                                ? {
+                                    ...s,
+                                    startDate: today,
+                                    endDate: today,
+                                  }
+                                : s
+                            )
+                          );
+                        }}
+                        showSearchIcon={false}
+                        onSearch={() => {}}
+                      />
+                    </div>
                   </div>
-                ))
-              )}
+
+                  {/* Error messages */}
+                  {errors.findIndex((e) => e === set.id) > -1 && (
+                    <div className="text-red-500 text-sm">
+                      All fields are required.
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
           </form>
         </div>
@@ -344,8 +341,12 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
         <div className="z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md">
             <h3 className="text-xl font-semibold mb-4">Confirm Delete</h3>
-            <p className="mb-1">Are you sure you want to remove this booking?</p>
-            <p className="font-light italic text-sm">Please check if this is currently playing.</p>
+            <p className="mb-1">
+              Are you sure you want to remove this booking?
+            </p>
+            <p className="font-light italic text-sm">
+              Please check if this is currently playing.
+            </p>
             <div className="flex justify-end mt-4 space-x-2">
               <button
                 onClick={() => handleDeleteConfirmation(false)}

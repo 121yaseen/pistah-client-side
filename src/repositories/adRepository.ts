@@ -1,35 +1,46 @@
 import prisma from "@/app/libs/prismadb";
 import { Ad, User } from "@/types/interface";
-// import { parse } from "date-fns";
-// import { zonedTimeToUtc } from "date-fns-tz";
 
-// Fetch all ads
+// Fetch all ads by user
 export const getAdsByUser = async (userId: string) => {
   return await prisma.ad.findMany({
     where: {
-      createdBy: userId,
+      createdById: userId,
     },
   });
 };
 
+// Create a new ad
 export const createAdAsync = async (ad: Ad, createdUser: User) => {
-  const { title, downloadLink, thumbnailUrl, duration } = ad;
+  const {
+    title,
+    downloadLink,
+    thumbnailUrl,
+    adBoardId,
+    adDuration,
+    remarks,
+    videoUrl,
+  } = ad;
 
   return await prisma.ad.create({
     data: {
       title,
       downloadLink,
       thumbnailUrl,
-      duration,
-      createdBy: createdUser.id,
+      adBoardId,
+      adDuration,
+      remarks: remarks ?? "",
+      videoUrl,
+      createdById: createdUser.id,
     },
   });
 };
 
+// Fetch ads with bookings by user
 export const getAdsWithBookingsByUser = async (userId: string) => {
   return await prisma.ad.findMany({
     where: {
-      createdBy: userId,
+      createdById: userId,
     },
     include: {
       bookings: {
@@ -41,19 +52,20 @@ export const getAdsWithBookingsByUser = async (userId: string) => {
   });
 };
 
+// Delete an ad and its related bookings
 export const deleteAdAndRelatedBooking = async (
   adId: string,
   userId: string
 ) => {
   try {
     const ad = await prisma.ad.findUnique({
-      where: { adId: adId },
+      where: { id: adId },
     });
-    if (ad?.createdBy !== userId) {
+    if (ad?.createdById !== userId) {
       throw new Error("Unauthorized");
     }
     await prisma.ad.delete({
-      where: { adId: adId },
+      where: { id: adId },
     });
     await prisma.booking.deleteMany({
       where: { adId: adId },
@@ -64,21 +76,27 @@ export const deleteAdAndRelatedBooking = async (
   }
 };
 
+// Edit an existing ad
 export const editAdAsync = async (adId: string, ad: Ad, userId: string) => {
   try {
     const existingAd = await prisma.ad.findUnique({
-      where: { adId: adId },
+      where: { id: adId },
     });
-    if (existingAd?.createdBy !== userId) {
+
+    if (existingAd?.createdById !== userId) {
       throw new Error("Unauthorized");
     }
+
     const updatedAd = await prisma.ad.update({
-      where: { adId: adId },
+      where: { id: adId },
       data: {
         title: ad.title,
         downloadLink: ad.downloadLink,
         thumbnailUrl: ad.thumbnailUrl,
-        duration: ad.duration,
+        adBoardId: ad.adBoardId,
+        adDuration: ad.adDuration,
+        remarks: ad.remarks,
+        videoUrl: ad.videoUrl,
       },
     });
     return updatedAd;

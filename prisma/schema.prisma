@@ -9,97 +9,114 @@ generator client {
 
 /**
  * Model: User
- * - Stores both normal users and ad board owners.
+ * - Represents both Ad Board Owners (SSP) and Advertisers (DSP).
  */
 model User {
-  userId    String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  role      String // e.g. "USER" or "OWNER"
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id            String   @id @default(uuid())
+  name          String
+  email         String   @unique
+  password      String?
+  profilePicUrl String?  @default("")
+  role          Role // "ADVERTISER" (DSP) or "OWNER" (SSP)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   // Relations
   ads      Ad[]      @relation("UserAds")
   adBoards AdBoard[] @relation("UserAdBoards")
   bookings Booking[] @relation("UserBookings")
   accounts Account[] @relation("UserAccounts")
+  company  Company?
+}
+
+/**
+ * Enum: Role
+ * - Differentiates between Advertisers (DSP) and Ad Board Owners (SSP).
+ */
+enum Role {
+  ADVERTISER
+  OWNER
 }
 
 /**
  * Model: Ad
- * - Includes the new fields: downloadLink, thumbnailUrl
- * - adType can be 'ONLINE' or 'OFFLINE' if needed.
+ * - Represents advertisements created by Advertisers (DSP) or Board Owners (SSP).
  */
 model Ad {
-  adId         String  @id @default(cuid())
-  createdBy    String
+  id           String   @id @default(uuid())
+  createdById  String
   title        String
-  // description  String?
-  // adType       String?
   downloadLink String?
   thumbnailUrl String?
-  duration     Int
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  adDuration   String
+  remarks      String
+  videoUrl     String   @default("")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   // Relations
-  user     User      @relation("UserAds", fields: [createdBy], references: [userId])
-  bookings Booking[]
+  createdUser User      @relation("UserAds", fields: [createdById], references: [id])
+  bookings    Booking[]
+  adBoardId   String?
+
+  @@index([title])
+  @@index([createdById])
 }
 
 /**
  * Model: AdBoard
- * - Includes the new fields: boardName, boardLength, boardWidth, dailyRate,
- * operationalHours, thumbnailUrl
+ * - Represents advertising boards created by SSP owners.
  */
 model AdBoard {
-  adBoardId        String  @id @default(cuid())
-  ownerId          String
-  location         String
-  description      String?
-  defaultCapacity  Int     @default(10)
-  boardName        String // NEW FIELD
-  boardLength      Float? // NEW FIELD
-  boardWidth       Float? // NEW FIELD
-  dailyRate        Float? // NEW FIELD
-  operationalHours String? // NEW FIELD
-  thumbnailUrl     String? // NEW FIELD
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String   @id @default(uuid())
+  ownerId             String
+  boardName           String
+  location            String
+  description         String?
+  dimensions          String
+  boardType           String
+  isAvailable         Boolean
+  dailyRate           Float
+  operationalHours    String
+  ownerContact        String
+  lastMaintenanceDate DateTime
+  imageUrl            String   @default("[]")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   // Relations
-  owner               User                @relation("UserAdBoards", fields: [ownerId], references: [userId])
+  owner               User                @relation("UserAdBoards", fields: [ownerId], references: [id])
   bookings            Booking[]           @relation("AdBoardBookings")
   boardAvailabilities BoardAvailability[] @relation("AdBoardAvailabilities")
+
+  @@index([boardName])
+  @@index([location])
+  @@index([ownerId])
 }
 
 /**
  * Model: BoardAvailability
- * - Optional table if you need to store custom per-day capacity or closures.
+ * - Defines availability for specific dates and capacities.
  */
 model BoardAvailability {
-  boardAvailId String   @id @default(cuid())
-  adBoardId    String
-  date         DateTime
-  capacity     Int?
+  id        String   @id @default(uuid())
+  adBoardId String
+  date      DateTime
+  capacity  Int?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   // Relations
-  adBoard AdBoard @relation("AdBoardAvailabilities", fields: [adBoardId], references: [adBoardId])
+  adBoard AdBoard @relation("AdBoardAvailabilities", fields: [adBoardId], references: [id])
 }
 
 /**
  * Model: Booking
- * - Ties a user, an ad, and an ad board together over a date range.
+ * - Associates DSP advertisers with an Ad Board over a date range.
  */
 model Booking {
-  bookingId String   @id @default(cuid())
+  id        String   @id @default(uuid())
   userId    String
   adId      String
   adBoardId String
@@ -111,13 +128,17 @@ model Booking {
   updatedAt DateTime @updatedAt
 
   // Relations
-  user    User    @relation("UserBookings", fields: [userId], references: [userId])
-  ad      Ad      @relation(fields: [adId], references: [adId])
-  adBoard AdBoard @relation("AdBoardBookings", fields: [adBoardId], references: [adBoardId])
+  user    User    @relation("UserBookings", fields: [userId], references: [id])
+  ad      Ad      @relation(fields: [adId], references: [id])
+  adBoard AdBoard @relation("AdBoardBookings", fields: [adBoardId], references: [id])
 }
 
+/**
+ * Model: Account
+ * - Handles OAuth accounts for users.
+ */
 model Account {
-  id                 String    @id @default(cuid())
+  id                 String    @id @default(uuid())
   userId             String
   provider           String
   providerAccountId  String
@@ -125,5 +146,25 @@ model Account {
   accessToken        String?
   accessTokenExpires DateTime?
 
-  user User @relation("UserAccounts", fields: [userId], references: [userId])
+  user User @relation("UserAccounts", fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([provider])
+  @@index([providerAccountId])
+}
+
+/**
+ * Model: Company
+ * - Associates a user with a company (for Advertisers in DSP).
+ */
+model Company {
+  id        String   @id @default(uuid())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String   @unique
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([name])
 }

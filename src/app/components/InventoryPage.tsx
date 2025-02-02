@@ -1,11 +1,10 @@
 "use client";
 
-import { AdBoard } from "@prisma/client";
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { useLoader } from "./shared/LoaderComponent";
 import AddCreativeForInvModal from "./modals/AddCreativeForInvModal";
 import ImageCarousel from "./shared/ImageCarousel";
+import { AdBoard } from "@/types/interface";
 
 export default function InventoryPageComponent() {
   const { showLoader, hideLoader } = useLoader();
@@ -43,11 +42,11 @@ export default function InventoryPageComponent() {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {adBoards.map((adBoard) => (
             <div
-              key={adBoard.adBoardId}
+              key={adBoard.id}
               className="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden"
             >
               <div className="relative w-full" style={{ height: "250px" }}>
-                <ImageCarousel images={[adBoard.thumbnailUrl ?? ""]} />
+                <ImageCarousel images={adBoard.imageUrl} />
               </div>
               <div className="p-4">
                 <h2 className="text-lg font-semibold">{adBoard.boardName}</h2>
@@ -61,12 +60,12 @@ export default function InventoryPageComponent() {
                   Owner Contact: {adBoard.ownerId}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Board Type: {adBoard.thumbnailUrl}
+                  Board Type: {adBoard.boardType}
                 </p>
                 <button
                   className="mt-4 w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
                   onClick={() => {
-                    setSelectedAdBoardId(adBoard.adBoardId);
+                    setSelectedAdBoardId(adBoard.id);
                     setShowBookingModal(true);
                   }}
                 >
