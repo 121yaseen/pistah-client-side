@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import DateRangePicker from "../shared/DateRangePicker";
-import { Booking, Creative } from "@/types/interface";
+import { Booking, Ad } from "@/types/interface";
 import { useLoader } from "../shared/LoaderComponent";
 import { useToast } from "@/app/context/ToastContext";
 import AddIcon from "@/icons/addIcon";
@@ -22,7 +22,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
 }) => {
   const { addToast } = useToast();
   const { showLoader, hideLoader } = useLoader();
-  const [ads, setAds] = useState<Creative[]>([]);
+  const [ads, setAds] = useState<Ad[]>([]);
   const [inventoryOptions, setInventoryOptions] = useState<
     { value: string; label: string }[]
   >([]);

@@ -1,14 +1,14 @@
 "use client";
 
-import { Creative } from "@/types/interface";
 import React, { useEffect, useState } from "react";
 import CreativeModal from "./CreateCreativeModal";
 import BookInventoryModal from "./BookInventoryModal";
+import { Ad } from "@/types/interface";
 
 type CreateAndBookCreativeModalProps = {
   onClose: () => void;
   fetchCreatives: () => void;
-  creativeToEdit?: Creative;
+  creativeToEdit?: Ad;
 };
 
 const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
@@ -18,11 +18,11 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
 }) => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(true);
-  const [creativeData, setCreativeData] = useState<Partial<Creative>>({
+  const [creativeData, setCreativeData] = useState<Partial<Ad>>({
     id: "",
     title: "",
     downloadLink: "",
-    duration: "",
+    adDuration: "",
     thumbnailUrl: "",
     remarks: "",
     videoUrl: "",

@@ -1,11 +1,11 @@
 import { createUser, getUser } from "@/repositories/userRepository";
-import { Role, User, UserDetails } from "@/types/interface";
+import { Role, User } from "@/types/interface";
 import { NextApiRequest } from "next";
 import bcrypt from "bcryptjs";
 import { getToken } from "next-auth/jwt";
 
 // Create User
-export const createUserAsync = async (user: UserDetails): Promise<User> => {
+export const createUserAsync = async (user: User): Promise<User> => {
   const hashedPassword = await bcrypt.hash(user.password ?? "", 12);
   const createdDbUser = await createUser(
     user.name,
@@ -18,6 +18,8 @@ export const createUserAsync = async (user: UserDetails): Promise<User> => {
     name: createdDbUser.name,
     email: createdDbUser.email,
     role: createdDbUser.role as Role,
+    createdAt: createdDbUser.createdAt.toISOString(),
+    updatedAt: createdDbUser.updatedAt.toISOString(),
   };
 };
 
@@ -51,9 +53,8 @@ export const getLoggedInUser = async (
     name: user.name,
     email: user.email,
     profilePicUrl: user.profilePicUrl ?? "",
-    company: user.company
-      ? { id: user.company.id, name: user.company.name }
-      : null,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
     role: user.role as Role,
   };
 };

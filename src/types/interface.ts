@@ -163,10 +163,6 @@ export interface AdsWithBooking extends Ad {
   bookings: BookingWithAdBoard[];
 }
 
-export interface CreativesWithBooking extends Creative {
-  bookings: BookingWithAdBoard[];
-}
-
 export interface BookingWithAdBoard extends Booking {
   adBoard: AdBoard;
 }

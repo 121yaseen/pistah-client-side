@@ -3,11 +3,7 @@
 import AddIcon from "@/icons/addIcon";
 import React, { useEffect, useState } from "react";
 import CreateAndBookCreativeModal from "./modals/CreateAndBookCreativeModal";
-import {
-  BookingWithAdBoard,
-  Creative,
-  CreativesWithBooking,
-} from "@/types/interface";
+import { Ad, AdsWithBooking, BookingWithAdBoard } from "@/types/interface";
 import Image from "next/image";
 import { useLoader } from "./shared/LoaderComponent";
 import PencilIcon from "@/icons/pencilIcon";
@@ -26,9 +22,9 @@ const CreativePageComponent: React.FC = () => {
   >(null);
   const { showLoader, hideLoader } = useLoader();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [creatives, setCreatives] = useState<CreativesWithBooking[]>([]);
+  const [creatives, setCreatives] = useState<AdsWithBooking[]>([]);
   const [selectedCreative, setSelectedCreative] = useState<string>("");
-  const [creativeToEdit, setCreativeToEdit] = useState<Creative | undefined>();
+  const [creativeToEdit, setCreativeToEdit] = useState<Ad>();
   const [existingBookingsForEdit, setExistingBookingsForEdit] = useState<
     BookingWithAdBoard[]
   >([]);
@@ -75,16 +71,18 @@ const CreativePageComponent: React.FC = () => {
     setShowBookingModal(true);
   };
 
-  const handleEditCreative = (creative: Creative) => {
+  const handleEditCreative = (creative: Ad) => {
     setCreativeToEdit(creative);
     setShowCreateModal(true);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const openDeleteConfirmModal = (index: string) => {
     //setDeleteIndex(index);
     setIsDeleteConfirmationOpen(true);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDeleteConfirmation = async (confirmed: boolean) => {
     // if (confirmed && deleteIndex !== null) {
     //   setIsLoading(true);
@@ -110,6 +108,7 @@ const CreativePageComponent: React.FC = () => {
     //setDeleteIndex(null);
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleDeleteCreative = async (creativeId: string) => {
     try {
       showLoader();

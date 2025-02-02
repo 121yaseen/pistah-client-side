@@ -27,3 +27,27 @@ export const uploadToS3 = async (file: Buffer, fileName: string) => {
       throw error;
     });
 };
+
+export const getPresignedUploadUrl = async (
+  fileName: string,
+  contentType: string = "video/mp4",
+  expires: number = 60
+) => {
+  const bucketName = getBucketName();
+
+  const params = {
+    Bucket: bucketName,
+    Key: fileName,
+    ContentType: contentType,
+    Expires: expires,
+  };
+
+  return s3.getSignedUrlPromise("putObject", params);
+};
+
+const getBucketName = () => {
+  if (!process.env.AWS_S3_BUCKET_NAME) {
+    throw new Error("AWS_S3_BUCKET_NAME is not defined");
+  }
+  return process.env.AWS_S3_BUCKET_NAME;
+};

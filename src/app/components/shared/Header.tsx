@@ -8,7 +8,6 @@ import ProfileIcon from "@/icons/profileIcon";
 import DarkModeToggle from "./DarkModeToggleButton";
 import InventoryIcon from "@/icons/inventoryIcon";
 import { signOut, useSession } from "next-auth/react";
-import PistahIcon from "@/icons/pistahIcon";
 import CreativeIcon from "@/icons/creativeIcon";
 import { useLoader } from "./LoaderComponent";
 
@@ -89,7 +88,12 @@ export default function Header({ navLinks = [] }: HeaderProps) {
       {/* Left Section: Logo */}
       <div className="flex items-center">
         <Link href="/" className="flex items-center">
-          <Image src={"/pistah.jpeg"} alt={""} width={"140"} height={"100"}></Image>
+          <Image
+            src={"/pistah.jpeg"}
+            alt={""}
+            width={"140"}
+            height={"100"}
+          ></Image>
         </Link>
       </div>
 
@@ -100,8 +104,9 @@ export default function Header({ navLinks = [] }: HeaderProps) {
           <Link
             key={link.href}
             href={link.href}
-            className={`${pathname === link.href ? "underline underline-offset-4" : ""
-              } font-medium`}
+            className={`${
+              pathname === link.href ? "underline underline-offset-4" : ""
+            } font-medium`}
           >
             {link.label}
           </Link>
@@ -111,21 +116,24 @@ export default function Header({ navLinks = [] }: HeaderProps) {
         <div className="flex items-center space-x-6">
           {/* Dashboard Icon */}
           <Link
-            className={`flex flex-col items-center group ${pathname === "/inventory"
-              ? "text-white border-b-2"
-              : "text-gray-500"
-              }`}
+            className={`flex flex-col items-center group ${
+              pathname === "/inventory"
+                ? "text-white border-b-2"
+                : "text-gray-500"
+            }`}
             href="/inventory"
           >
             <span
-              className={`text-xs mt-1 group-hover:text-white ${pathname === "/inventory" ? "text-white" : "text-gray-500"
-                }`}
+              className={`text-xs mt-1 group-hover:text-white ${
+                pathname === "/inventory" ? "text-white" : "text-gray-500"
+              }`}
             >
               <InventoryIcon />
             </span>
             <span
-              className={`text-xs mt-1 group-hover:text-white ${pathname === "/inventory" ? "text-white" : "text-gray-400"
-                }`}
+              className={`text-xs mt-1 group-hover:text-white ${
+                pathname === "/inventory" ? "text-white" : "text-gray-400"
+              }`}
             >
               Inventory
             </span>
@@ -133,21 +141,24 @@ export default function Header({ navLinks = [] }: HeaderProps) {
 
           {/* Inventory Icon */}
           <Link
-            className={`flex flex-col items-center group ${pathname === "/campaigns"
-              ? "text-white border-b-2"
-              : "text-gray-500"
-              }`}
+            className={`flex flex-col items-center group ${
+              pathname === "/campaigns"
+                ? "text-white border-b-2"
+                : "text-gray-500"
+            }`}
             href="/campaigns"
           >
             <span
-              className={`text-xs mt-1 group-hover:text-white ${pathname === "/campaigns" ? "text-white" : "text-gray-500"
-                }`}
+              className={`text-xs mt-1 group-hover:text-white ${
+                pathname === "/campaigns" ? "text-white" : "text-gray-500"
+              }`}
             >
               <CreativeIcon />
             </span>
             <span
-              className={`text-xs mt-1 group-hover:text-white ${pathname === "/campaigns" ? "text-white" : "text-gray-400"
-                }`}
+              className={`text-xs mt-1 group-hover:text-white ${
+                pathname === "/campaigns" ? "text-white" : "text-gray-400"
+              }`}
             >
               My Campaigns
             </span>
