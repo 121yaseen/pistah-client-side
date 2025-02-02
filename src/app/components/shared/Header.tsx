@@ -89,7 +89,7 @@ export default function Header({ navLinks = [] }: HeaderProps) {
       {/* Left Section: Logo */}
       <div className="flex items-center">
         <Link href="/" className="flex items-center">
-          <PistahIcon />
+          <Image src={"/pistah.jpeg"} alt={""} width={"140"} height={"100"}></Image>
         </Link>
       </div>
 

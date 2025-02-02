@@ -28,6 +28,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
   >([]);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
 
   // If existingBookings length > 0 => we are in edit mode
   const isEditMode = existingBookings.length > 0;
@@ -103,6 +104,21 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const newErrors: string[] = [];
+    let hasErrors = false;
+    bookingSets.forEach((set) => {
+      if (set.adBoardId === "" || set.startDate === "" || set.endDate === "") {
+        newErrors.push(set.bookingId);
+        hasErrors = true;
+      }
+    });
+    setErrors(newErrors);
+    if (hasErrors) {
+      addToast("Please fill all fields", "error");
+      return;
+    }
+
     try {
       showLoader();
       // If edit mode => PUT, else => POST
@@ -211,7 +227,11 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                   </div>
                 ) :
                 (bookingSets.map((set) => (
-                  <div key={set.bookingId} className="group p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800 relative hover:bg-gray-200 dark:hover:bg-gray-500 dark:hover:border-gray-500 transition-colors">
+                  <div
+                    key={set.bookingId}
+                    className={`group p-4 rounded-md border relative transition-colors bg-gray-100 dark:bg-gray-800 
+                      hover:bg-gray-200 dark:hover:bg-gray-500 dark:hover:border-gray-500 
+                      ${errors.findIndex(e => e === set.bookingId) > -1 ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}>
                     {/* Delete Button */}
                     <button
                       type="button"
@@ -331,6 +351,13 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                         />
                       </div>
                     </div>
+
+                    {/* Error messages */}
+                    {(errors.findIndex(e => e === set.bookingId) > -1) && (
+                      <div className="text-red-500 text-sm">
+                        All fields are required.
+                      </div>
+                    )}
                   </div>
                 )))}
             </div>

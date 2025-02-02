@@ -30,6 +30,7 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
   ]);
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
   const [deleteIndex, setDeleteIndex] = useState<string | null>(null);
+  const [errors, setErrors] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchAds = async () => {
@@ -87,6 +88,21 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const newErrors: string[] = [];
+    let hasErrors = false;
+    bookingSets.forEach((set) => {
+      if (set.adId === "" || set.startDate === "" || set.endDate === "") {
+        newErrors.push(set.bookingId);
+        hasErrors = true;
+      }
+    });
+    setErrors(newErrors);
+    if (hasErrors) {
+      addToast("Please fill all fields", "error");
+      return;
+    }
+
     try {
       showLoader();
       const response = await fetch("/api/booking", {
@@ -169,7 +185,9 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                 bookingSets.map((set) => (
                   <div
                     key={set.bookingId}
-                    className="group p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800 relative hover:bg-gray-200 dark:hover:bg-gray-500 dark:hover:border-gray-500 transition-colors"
+                    className={`group p-4 rounded-md border relative transition-colors bg-gray-100 dark:bg-gray-800 
+                      hover:bg-gray-200 dark:hover:bg-gray-500 dark:hover:border-gray-500 
+                      ${errors.findIndex(e => e === set.bookingId) > -1 ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                   >
                     {/* Delete Button */}
                     <button
@@ -290,6 +308,13 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                         />
                       </div>
                     </div>
+
+                    {/* Error messages */}
+                    {(errors.findIndex(e => e === set.bookingId) > -1) && (
+                      <div className="text-red-500 text-sm">
+                        All fields are required.
+                      </div>
+                    )}
                   </div>
                 ))
               )}
