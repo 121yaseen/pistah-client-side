@@ -6,6 +6,7 @@ import { Booking, Creative } from "@/types/interface";
 import { useLoader } from "../shared/LoaderComponent";
 import { useToast } from "@/app/context/ToastContext";
 import AddIcon from "@/icons/addIcon";
+import DeleteIcon from "@/icons/deleteIcon";
 
 type AddCreativeForInvModalProps = {
   onClose: () => void;
@@ -116,6 +117,10 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
     onClose();
   };
 
+  const handleDelete = (bookingId: string) => {
+    setBookingSets((prev) => prev.filter((set) => set.bookingId !== bookingId));
+  };
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white dark:bg-gray-800 text-black dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
@@ -150,7 +155,7 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                 <div key={set.bookingId} className="p-4 rounded-md border dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
                   <div className="flex flex-row gap-4 items-center">
                     {/* Dropdown */}
-                    <div className="flex-1">
+                    <div className="w-72">
                       <select
                         className="w-full p-2 border rounded dark:bg-gray-700 dark:border-gray-800 cursor-pointer text-sm font-semibold"
                         value={set.adId}
@@ -227,6 +232,15 @@ const AddCreativeForInvModal: React.FC<AddCreativeForInvModalProps> = ({ onClose
                         onSearch={() => { }}
                       />
                     </div>
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => handleDelete(set.bookingId)}
+                      className="p-1 border border-red-500 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition flex items-center justify-center"
+                      style={{ width: "35px", height: "35px" }}
+                    >
+                      <DeleteIcon />
+                    </button>
                   </div>
                 </div>
               ))}

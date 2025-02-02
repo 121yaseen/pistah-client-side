@@ -6,6 +6,7 @@ import { Booking, Creative } from "@/types/interface";
 import { useLoader } from "../shared/LoaderComponent";
 import { useToast } from "@/app/context/ToastContext";
 import AddIcon from "@/icons/addIcon";
+import DeleteIcon from "@/icons/deleteIcon";
 
 type BookInventoryModalProps = {
   onClose: () => void;
@@ -149,6 +150,10 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
     }
   };
 
+  const handleDelete = (bookingId: string) => {
+    setBookingSets((prev) => prev.filter((set) => set.bookingId !== bookingId));
+  };
+  
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div
@@ -274,6 +279,15 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
                         onSearch={() => { }}
                       />
                     </div>
+
+                    {/* Delete Button */}
+                    <button
+                      onClick={() => handleDelete(set.bookingId)}
+                      className="p-1 border border-red-500 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition flex items-center justify-center"
+                      style={{ width: "35px", height: "35px" }}
+                    >
+                      <DeleteIcon />
+                    </button>
                   </div>
                 </div>
               ))}
