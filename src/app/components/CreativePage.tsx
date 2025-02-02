@@ -28,6 +28,7 @@ const CreativePageComponent: React.FC = () => {
   const [existingBookingsForEdit, setExistingBookingsForEdit] = useState<
     BookingWithAdBoard[]
   >([]);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
 
   const fetchCreativesWithBooking = async () => {
     try {
@@ -72,6 +73,37 @@ const CreativePageComponent: React.FC = () => {
   const handleEditCreative = (creative: Creative) => {
     setCreativeToEdit(creative);
     setShowCreateModal(true);
+  };
+
+  const openDeleteConfirmModal = (index: string) => {
+    //setDeleteIndex(index);
+    setIsDeleteConfirmationOpen(true);
+  };
+
+  const handleDeleteConfirmation = async (confirmed: boolean) => {
+    // if (confirmed && deleteIndex !== null) {
+    //   setIsLoading(true);
+    //   const adBoardId = adBoards[deleteIndex]?.id;
+    //   if (adBoardId) {
+    //     deleteAdBoard(adBoardId)
+    //       .then(
+    //         () => {
+    //           addToast("Inventory deleted successfully!", "success");
+    //         },
+    //         () => {
+    //           addToast("Failed to delete Inventory!", "error");
+    //         }
+    //       )
+    //       .finally(async () => {
+    //         await loadAdBoards();
+    //         setIsLoading(false);
+    //       });
+    //   } else {
+    //     addToast("Inventory Id is undefined!", "error");
+    //   }
+    // }
+    setIsDeleteConfirmationOpen(false);
+    //setDeleteIndex(null);
   };
 
   return (
@@ -179,6 +211,7 @@ const CreativePageComponent: React.FC = () => {
                     <button
                       className="p-2 border border-red-500 text-red-500 rounded-full hover:bg-red-500 hover:text-white transition flex items-center justify-center"
                       style={{ width: "40px", height: "40px" }}
+                      onClick={() => openDeleteConfirmModal(cr.id)}
                     >
                       <DeleteIcon />
                     </button>
@@ -224,6 +257,30 @@ const CreativePageComponent: React.FC = () => {
           onEdit={true}
           creativeToEdit={creativeToEdit}
         />
+      )}
+
+      {isDeleteConfirmationOpen && (
+        <div className="z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md">
+            <h3 className="text-xl font-semibold mb-4">Confirm Delete</h3>
+            <p className="mb-1">Are you sure you want to delete this Campaign?</p>
+            <p className="font-light italic text-sm">The added creative and selected inventories will be removed.</p>
+            <div className="flex justify-end mt-4 space-x-2">
+              <button
+                onClick={() => handleDeleteConfirmation(false)}
+                className="px-4 py-2 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDeleteConfirmation(true)}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

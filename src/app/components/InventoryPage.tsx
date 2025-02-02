@@ -37,7 +37,7 @@ export default function InventoryPageComponent() {
   }, [showBookingModal]);
 
   return (
-    <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100">
+    <div className="min-h-screen w-full bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-100 px-4 sm:px-6 md:px-12 lg:px-16 xl:px-20">
       <div className="container mx-auto p-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {adBoards.map((adBoard) => (
