@@ -273,7 +273,7 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({ onClose, onCreative
         className="bg-white dark:bg-gray-800 dark:text-gray-200 rounded-lg shadow-lg flex flex-col"
         style={{
           width: "50%",
-          maxHeight: "90vh",
+          maxHeight: "90%",
           overflow: "hidden",
         }}
       >
