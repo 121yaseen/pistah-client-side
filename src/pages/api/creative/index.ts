@@ -4,12 +4,56 @@ import { getLoggedInUser } from "@/services/userService";
 import { uploadToS3 } from "@/services/s3Service";
 import formidable from "formidable";
 import fs from "fs";
+import path from "path";
 import { deleteAdAndRelatedBooking } from "@/repositories/adRepository";
 
 export const config = {
   api: {
     bodyParser: false,
   },
+};
+const parseForm = async (req: NextApiRequest) => {
+  return new Promise<{ fields: formidable.Fields; files: formidable.Files }>(
+    (resolve, reject) => {
+      const form = formidable();
+      form.parse(req, (err, fields, files) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+        resolve({ fields, files });
+      });
+    }
+  );
+};
+const processFields = (fields: formidable.Fields) => {
+  const {
+    title,
+    downloadLink,
+    adBoardId,
+    adDisplayStartDate,
+    adDisplayEndDate,
+    adDuration,
+    videoUrl,
+    remarks,
+  } = fields as { [key: string]: string | string[] };
+
+  return {
+    adTitle: Array.isArray(title) ? title[0] : title,
+    adDownloadLink: Array.isArray(downloadLink)
+      ? downloadLink[0]
+      : downloadLink,
+    adAdBoardId: Array.isArray(adBoardId) ? adBoardId[0] : adBoardId,
+    adAdDisplayStartDate: Array.isArray(adDisplayStartDate)
+      ? adDisplayStartDate[0]
+      : adDisplayStartDate,
+    adAdDisplayEndDate: Array.isArray(adDisplayEndDate)
+      ? adDisplayEndDate[0]
+      : adDisplayEndDate,
+    adAdDuration: Array.isArray(adDuration) ? adDuration[0] : adDuration,
+    adVideoUrl: Array.isArray(videoUrl) ? videoUrl[0] : videoUrl,
+    adRemarks: Array.isArray(remarks) ? remarks[0] : remarks,
+  };
 };
 
 export default async function handler(
@@ -39,103 +83,66 @@ export default async function handler(
       return res.status(400).json({ error: "Missing or invalid userId" });
     }
 
-    const form = formidable();
-
-    form.parse(req, async (err, fields, files) => {
-      if (err) {
-        console.error("Error parsing form:", err);
-        return res.status(500).json({ error: "Error parsing form data" });
-      }
-      const { title, downloadLink, thumbnailUrl, duration } = fields as {
-        [key: string]: string | string[];
-      };
-
-      const ad = {
-        id: "",
-        title: Array.isArray(title) ? title[0] : title,
-        downloadLink: Array.isArray(downloadLink)
-          ? downloadLink[0]
-          : downloadLink,
-        thumbnailUrl: Array.isArray(thumbnailUrl)
-          ? thumbnailUrl[0]
-          : thumbnailUrl,
-        duration: Number(Array.isArray(duration) ? duration[0] : duration),
-        createdBy: userId,
-        thumbnailFile: undefined,
-      };
-
-      if (!ad.title || !ad.downloadLink || !ad.duration) {
+    try {
+      const { fields, files } = await parseForm(req);
+      const {
+        adTitle,
+        adDownloadLink,
+        adAdBoardId,
+        adAdDisplayStartDate,
+        adAdDisplayEndDate,
+        adAdDuration,
+        adVideoUrl,
+        adRemarks,
+      } = processFields(fields);
+      if (!adTitle || !adAdDuration || !files.thumbnail) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
-      if (files.thumbnailFile) {
-        const file = Array.isArray(files.thumbnailFile)
-          ? files.thumbnailFile[0]
-          : files.thumbnailFile;
-        if (file.size > 5 * 1024 * 1024) {
-          return res
-            .status(400)
-            .json({ error: "Thumbnail file must be less than 5MB" });
-        }
+      const thumbnailFile = Array.isArray(files.thumbnail)
+        ? files.thumbnail[0]
+        : files.thumbnail;
 
-        try {
-          const fileBuffer = await fs.promises.readFile(file.filepath);
-          const thumbnailUrl = await uploadToS3(
-            fileBuffer,
-            file.originalFilename || "default-filename"
-          );
-          ad.thumbnailUrl = thumbnailUrl;
-        } catch (error) {
-          console.error("Error uploading thumbnail to S3:", error);
-          return res.status(500).json({ error: "Failed to upload thumbnail" });
-        }
-      }
-      if (!ad.thumbnailUrl) {
-        return res.status(400).json({ error: "Missing required fields" });
+      if (thumbnailFile.size > 5 * 1024 * 1024) {
+        return res
+          .status(400)
+          .json({ error: "Thumbnail must be less than 5MB" });
       }
 
-      try {
-        console.log("Creating Ad: ", {
-          ...ad,
-          createdById: userId,
-          adBoardId: "default-board-id",
-          adDisplayStartDate: new Date().toISOString(),
-          adDisplayEndDate: new Date().toISOString(),
-          remarks: "",
-          videoUrl: ad.downloadLink,
+      const ROOT_DIR = "/safe/upload/directory";
+      const resolvedPath = fs.realpathSync(
+        path.resolve(ROOT_DIR, thumbnailFile.filepath)
+      );
+      const fileBuffer = await fs.promises.readFile(resolvedPath);
+      const thumbnailUrl = await uploadToS3(
+        fileBuffer,
+        thumbnailFile.originalFilename || "default-filename"
+      );
+      const newAd = await createAd(
+        {
+          id: "", // This will be generated by the database
+          title: adTitle,
+          downloadLink: adDownloadLink ?? "",
+          adBoardId: adAdBoardId,
+          adDisplayStartDate: adAdDisplayStartDate,
+          adDisplayEndDate: adAdDisplayEndDate,
+          adDuration: adAdDuration,
+          thumbnailUrl,
+          remarks: adRemarks,
+          videoUrl: adVideoUrl ?? "",
+          createdById: user.id,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),
-          adDuration: "",
-        });
-        const createdAd = await createAd(
-          {
-            ...ad,
-            createdById: user.id,
-            adBoardId: "default-board-id",
-            adDisplayStartDate: new Date().toISOString(),
-            adDisplayEndDate: new Date().toISOString(),
-            remarks: "",
-            videoUrl: ad.downloadLink,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-            adDuration: "",
-            createdUser: user,
-          },
-          user
-        );
-        return res.status(201).json({
-          id: createdAd.id,
-          title: createdAd.title,
-          downloadLink: createdAd.downloadLink ?? "",
-          thumbnailUrl: createdAd.thumbnailUrl ?? "",
-          duration: createdAd.adDuration,
-          createdBy: createdAd.createdById,
-        });
-      } catch (error) {
-        console.error("Error creating ad:", error);
-        return res.status(500).json({ error: "Failed to create ad" });
-      }
-    });
+          createdUser: user,
+        },
+        user
+      );
+
+      return res.status(201).json(newAd);
+    } catch (error) {
+      console.error("Error creating ad:", error);
+      return res.status(500).json({ error: "Internal Server Error" });
+    }
   } else if (req.method === "DELETE") {
     const user = await getLoggedInUser(req);
     const userId = user?.id;

@@ -3,18 +3,18 @@
 import React, { useState, useEffect } from "react";
 import { useToast } from "@/app/context/ToastContext";
 import { useLoader } from "../shared/LoaderComponent";
-import { Creative } from "@/types/interface";
 import Image from "next/image";
 import axios from "axios";
 import UploadIcon from "@/icons/uploadIcon";
 import VideoUploadIcon from "@/icons/videoUploadIcon";
 import VideoIcon from "@/icons/videoIcon";
+import { Ad } from "@/types/interface";
 
 type CreateCreativeModalProps = {
   onClose: () => void;
-  onCreativeCreated?: (creativeData: Creative) => void;
+  onCreativeCreated?: (creativeData: Ad) => void;
   onEdit: boolean;
-  creativeToEdit?: Creative;
+  creativeToEdit?: Ad;
 };
 
 const CreativeModal: React.FC<CreateCreativeModalProps> = ({
@@ -47,7 +47,7 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({
         id: creativeToEdit.id,
         title: creativeToEdit.title,
         downloadLink: creativeToEdit.downloadLink || "",
-        adDuration: creativeToEdit.duration,
+        adDuration: creativeToEdit.adDuration,
         thumbnailUrl: creativeToEdit.thumbnailUrl ?? "",
         videoUrl: creativeToEdit.videoUrl || "",
         remarks: creativeToEdit.remarks ?? "",
@@ -258,7 +258,7 @@ const CreativeModal: React.FC<CreateCreativeModalProps> = ({
     formData.append("createdById", creativeData.createdById); // Ensure createdById is included
 
     try {
-      const response = await fetch("/api/creatives", {
+      const response = await fetch("/api/creative", {
         method: "POST",
         body: formData,
       });

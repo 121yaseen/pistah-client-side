@@ -46,11 +46,7 @@ export const getUser = async (email: string): Promise<User | null> => {
     email: user.email,
     role: user.role as Role,
     profilePicUrl: user.profilePicUrl ?? "",
-    company: user.company
-      ? {
-          id: user.company.id,
-          name: user.company.name,
-        }
-      : null,
+    createdAt: user.createdAt.toISOString(),
+    updatedAt: user.updatedAt.toISOString(),
   };
 };

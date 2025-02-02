@@ -25,7 +25,6 @@ export const fetchAdsWithBookings = async (createdUserId: string) => {
     downloadLink: ad.downloadLink || "",
     thumbnailUrl: ad.thumbnailUrl || "",
     thumbnailFile: undefined,
-    adBoardId: ad.adBoardId,
     adDuration: ad.adDuration,
     remarks: ad.remarks,
     videoUrl: ad.videoUrl,
