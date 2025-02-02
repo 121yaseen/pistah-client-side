@@ -359,7 +359,7 @@ const BookInventoryModal: React.FC<BookInventoryModalProps> = ({
       {isDeleteConfirmationOpen && (
         <div className="z-50 fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md w-full max-w-md">
-            <h3 className="text-xl font-semibold mb-4">Confirm Delete</h3>
+            <h3 className="text-xl font-semibold mb-4">Confirm Delete </h3>
             <p className="mb-1">Are you sure you want to remove this booking?</p>
             <p className="font-light italic text-sm">Please check if this is currently playing.</p>
             <div className="flex justify-end mt-4 space-x-2">
