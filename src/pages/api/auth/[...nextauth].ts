@@ -1,24 +1,32 @@
 import bcrypt from "bcryptjs";
-import prisma from "@/app/libs/prismadb"; // Ensure the Prisma client is configured correctly
-import NextAuth from "next-auth";
+import prisma from "@/app/libs/prismadb";
+import NextAuth, { DefaultSession, DefaultUser } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 declare module "next-auth" {
-  interface Session {
+  interface Session extends DefaultSession {
     user: {
       id: string;
       name: string;
       email: string;
-    };
+      role: "SSP" | "DSP"; // Ensuring only valid roles
+    } & DefaultSession["user"];
+  }
+
+  interface User extends DefaultUser {
+    id: string;
+    role: "SSP" | "DSP"; // Adding role to User type
   }
 }
 
+// Extend NextAuth JWT Type to include role
 declare module "next-auth/jwt" {
   interface JWT {
     user: {
       id: string;
       name: string;
       email: string;
+      role: "SSP" | "DSP";
     };
   }
 }
@@ -46,7 +54,9 @@ export default NextAuth({
         }
 
         if (!user.password) {
-          throw new Error("Please use a third-party provider to log in.");
+          throw new Error(
+            "This account uses OAuth login. Try a different method."
+          );
         }
 
         // Validate password
@@ -58,30 +68,38 @@ export default NextAuth({
           throw new Error("Invalid password.");
         }
 
-        // Return user object to be stored in the token
-        return { id: user.userId, name: user.name, email: user.email };
+        // 🔹 Fix: Explicitly typecast role to "SSP" | "DSP"
+        const userRole = user.role as "SSP" | "DSP";
+
+        // Return user object including role
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          role: userRole,
+        };
       },
     }),
   ],
   callbacks: {
-    // Attach user information to the session
     async session({ session, token }) {
       if (token?.user) {
         session.user = {
           id: token.user.id,
           name: token.user.name,
           email: token.user.email,
+          role: token.user.role,
         };
       }
       return session;
     },
-    // Attach user information to the JWT
     async jwt({ token, user }) {
       if (user) {
         token.user = {
           id: user.id,
           name: user.name ?? "",
           email: user.email ?? "",
+          role: user.role ?? "DSP", // Default role to DSP if undefined
         };
       }
       return token;

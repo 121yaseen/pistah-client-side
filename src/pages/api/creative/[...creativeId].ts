@@ -1,4 +1,4 @@
-import { deleteAd, editAd } from "@/services/adService";
+import { deleteAdAndRelatedBooking, editAdAsync } from "@/repositories/adRepository";
 import { getLoggedInUser } from "@/services/userService";
 import { NextApiRequest, NextApiResponse } from "next";
 import formidable from "formidable";
@@ -32,7 +32,7 @@ export default async function handler(
 
   if (req.method === "DELETE") {
     try {
-      await deleteAd(adId, userId);
+      await deleteAdAndRelatedBooking(adId, userId);
       return res.status(204).end();
     } catch (error) {
       console.error("Error deleting ad:", error);
@@ -46,11 +46,21 @@ export default async function handler(
         console.error("Error parsing form:", err);
         return res.status(500).json({ error: "Error parsing form data" });
       }
-      const { title, downloadLink, thumbnailUrl, duration } = fields as {
+      const {
+        title,
+        downloadLink,
+        thumbnailUrl,
+        adBoardId,
+        adDisplayStartDate,
+        adDisplayEndDate,
+        adDuration,
+        remarks,
+        videoUrl,
+      } = fields as {
         [key: string]: string | string[];
       };
 
-      const ad: Ad = {
+      const ad: Partial<Ad> = {
         id: adId,
         title: Array.isArray(title) ? title[0] : title,
         downloadLink: Array.isArray(downloadLink)
@@ -59,12 +69,27 @@ export default async function handler(
         thumbnailUrl: Array.isArray(thumbnailUrl)
           ? thumbnailUrl[0]
           : thumbnailUrl,
-        duration: Number(Array.isArray(duration) ? duration[0] : duration),
-        createdBy: userId,
-        thumbnailFile: undefined,
+        adBoardId: Array.isArray(adBoardId) ? adBoardId[0] : adBoardId,
+        adDisplayStartDate: Array.isArray(adDisplayStartDate)
+          ? adDisplayStartDate[0]
+          : adDisplayStartDate,
+        adDisplayEndDate: Array.isArray(adDisplayEndDate)
+          ? adDisplayEndDate[0]
+          : adDisplayEndDate,
+        adDuration: Array.isArray(adDuration) ? adDuration[0] : adDuration,
+        remarks: Array.isArray(remarks) ? remarks[0] : remarks,
+        videoUrl: Array.isArray(videoUrl) ? videoUrl[0] : videoUrl,
+        createdById: userId,
       };
 
-      if (!ad.title || !ad.downloadLink || !ad.duration) {
+      if (
+        !ad.title ||
+        !ad.downloadLink ||
+        !ad.adDuration ||
+        !ad.adBoardId ||
+        !ad.adDisplayStartDate ||
+        !ad.adDisplayEndDate
+      ) {
         return res.status(400).json({ error: "Missing required fields" });
       }
 
@@ -95,15 +120,8 @@ export default async function handler(
       }
 
       try {
-        const updatedAd = await editAd(adId, ad, userId);
-        return res.status(200).json({
-          id: updatedAd.adId,
-          title: updatedAd.title,
-          downloadLink: updatedAd.downloadLink ?? "",
-          thumbnailUrl: updatedAd.thumbnailUrl ?? "",
-          duration: updatedAd.duration,
-          createdBy: updatedAd.createdBy,
-        });
+        const updatedAd = await editAdAsync(adId, ad as Ad, userId);
+        return res.status(200).json(updatedAd);
       } catch (error) {
         console.error("Error updating ad:", error);
         return res.status(500).json({ error: "Failed to update ad" });

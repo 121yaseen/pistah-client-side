@@ -18,7 +18,7 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
 }) => {
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(true);
-  const [creativeData, setCreativeData] = useState<Creative>({
+  const [creativeData, setCreativeData] = useState<Partial<Creative>>({
     id: "",
     title: "",
     downloadLink: "",
@@ -27,8 +27,8 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
     remarks: "",
     videoUrl: "",
     createdById: "",
-    createdAt: "",
-    updatedAt: "",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   });
 
   useEffect(() => {
@@ -60,7 +60,7 @@ const CreateAndBookCreativeModal: React.FC<CreateAndBookCreativeModalProps> = ({
       {showBookingModal && (
         <BookInventoryModal
           onClose={handleBookingModalClose}
-          creativeId={creativeData.id}
+          creativeId={creativeData.id ?? ""}
           fetchCreatives={fetchCreatives}
         />
       )}

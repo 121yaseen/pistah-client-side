@@ -30,7 +30,7 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
           <div className="grid grid-cols-2 gap-4">
             {bookings.map((booking) => (
               <div
-                key={booking.bookingId}
+                key={booking.id}
                 className="mb-4 p-4 border-2 rounded-lg border-gray-200 dark:border-gray-700"
               >
                 <h3 className="text-lg font-semibold text-black dark:text-white mb-2">
@@ -38,28 +38,36 @@ const BookingDetailsModal: React.FC<BookingDetailsModalProps> = ({
                 </h3>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-gray-600 dark:text-gray-400">Start Date</p>
+                    <p className="text-gray-600 dark:text-gray-400">
+                      Start Date
+                    </p>
                     <p className="text-black dark:text-white">
-                      {new Date(booking.startDate).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                      }).replace(/ /g, '-')}
+                      {new Date(booking.startDate)
+                        .toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                        .replace(/ /g, "-")}
                     </p>
                   </div>
                   <div>
                     <p className="text-gray-600 dark:text-gray-400">End Date</p>
                     <p className="text-black dark:text-white">
-                      {new Date(booking.endDate).toLocaleDateString('en-GB', {
-                        day: '2-digit',
-                        month: 'short',
-                        year: 'numeric'
-                      }).replace(/ /g, '-')}
+                      {new Date(booking.endDate)
+                        .toLocaleDateString("en-GB", {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                        })
+                        .replace(/ /g, "-")}
                     </p>
                   </div>
                   <div>
                     <p className="text-gray-600 dark:text-gray-400">Status</p>
-                    <p className="text-black dark:text-white">{booking.status}</p>
+                    <p className="text-black dark:text-white">
+                      {booking.status}
+                    </p>
                   </div>
                 </div>
               </div>

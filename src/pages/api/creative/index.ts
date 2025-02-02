@@ -4,6 +4,7 @@ import { getLoggedInUser } from "@/services/userService";
 import { uploadToS3 } from "@/services/s3Service";
 import formidable from "formidable";
 import fs from "fs";
+import { deleteAdAndRelatedBooking } from "@/repositories/adRepository";
 
 export const config = {
   api: {
@@ -94,22 +95,70 @@ export default async function handler(
       }
 
       try {
-        const createdAd = await createAd(ad, user);
+        console.log("Creating Ad: ", {
+          ...ad,
+          createdById: userId,
+          adBoardId: "default-board-id",
+          adDisplayStartDate: new Date().toISOString(),
+          adDisplayEndDate: new Date().toISOString(),
+          remarks: "",
+          videoUrl: ad.downloadLink,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          adDuration: "",
+        });
+        const createdAd = await createAd(
+          {
+            ...ad,
+            createdById: user.id,
+            adBoardId: "default-board-id",
+            adDisplayStartDate: new Date().toISOString(),
+            adDisplayEndDate: new Date().toISOString(),
+            remarks: "",
+            videoUrl: ad.downloadLink,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            adDuration: "",
+            createdUser: user,
+          },
+          user
+        );
         return res.status(201).json({
-          id: createdAd.adId,
+          id: createdAd.id,
           title: createdAd.title,
           downloadLink: createdAd.downloadLink ?? "",
           thumbnailUrl: createdAd.thumbnailUrl ?? "",
-          duration: createdAd.duration,
-          createdBy: createdAd.createdBy,
+          duration: createdAd.adDuration,
+          createdBy: createdAd.createdById,
         });
       } catch (error) {
         console.error("Error creating ad:", error);
         return res.status(500).json({ error: "Failed to create ad" });
       }
     });
+  } else if (req.method === "DELETE") {
+    const user = await getLoggedInUser(req);
+    const userId = user?.id;
+
+    if (!userId || typeof userId !== "string") {
+      return res.status(400).json({ error: "Missing or invalid userId" });
+    }
+
+    const { adId } = req.query;
+
+    if (!adId || typeof adId !== "string") {
+      return res.status(400).json({ error: "Missing or invalid adId" });
+    }
+
+    try {
+      await deleteAdAndRelatedBooking(adId, userId);
+      return res.status(204).end();
+    } catch (error) {
+      console.error("Error deleting ad:", error);
+      return res.status(500).json({ error: "Failed to delete ad" });
+    }
   } else {
-    res.setHeader("Allow", ["GET", "POST"]);
+    res.setHeader("Allow", ["GET", "POST", "DELETE"]);
     return res.status(405).json({ error: `Method ${req.method} Not Allowed` });
   }
 }

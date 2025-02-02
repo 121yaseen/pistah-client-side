@@ -6,9 +6,7 @@ import {
   deleteBooking,
 } from "@/repositories/bookingRepository";
 
-export const createNewBookings = async (
-  bookings: Booking[]
-): Promise<Booking[]> => {
+export const createNewBookings = async (bookings: Booking[]) => {
   try {
     const createdBookings = await createBookings(bookings);
     return createdBookings;
@@ -18,9 +16,7 @@ export const createNewBookings = async (
   }
 };
 
-export const updateExistingBookings = async (
-  bookings: Booking[]
-): Promise<Booking[]> => {
+export const updateExistingBookings = async (bookings: Booking[]) => {
   try {
     const updatedBookings = await updateBookings(bookings);
     return updatedBookings;
