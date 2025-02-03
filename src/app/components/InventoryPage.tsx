@@ -54,10 +54,10 @@ export default function InventoryPageComponent() {
                   {adBoard.location}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Daily Rate: ${adBoard.dailyRate}
+                  Daily Rate: {adBoard.dailyRate}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Owner Contact: {adBoard.ownerId}
+                  Owner Contact: {adBoard.ownerContact}
                 </p>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
                   Board Type: {adBoard.boardType}
